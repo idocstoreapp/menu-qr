@@ -1,0 +1,512 @@
+/* Variables CSS - Colores Árabes */
+:root {
+    --gold: #D4AF37;
+    --dark-gold: #B8941F;
+    --light-gold: #F4E4BC;
+    --terracotta: #C17A4A;
+    --dark-terracotta: #8B4513;
+    --beige: #F5E6D3;
+    --dark-beige: #E8D5C4;
+    --brown: #654321;
+    --dark-brown: #3E2723;
+    --cream: #FFF8E7;
+    --white: #FFFFFF;
+    --black: #1A1A1A;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* Reset y Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(135deg, var(--dark-brown) 0%, var(--brown) 50%, var(--dark-terracotta) 100%);
+    background-attachment: fixed;
+    color: var(--cream);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Patrón de fondo árabe */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(212, 175, 55, 0.03) 35px, rgba(212, 175, 55, 0.03) 70px),
+        repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(212, 175, 55, 0.03) 35px, rgba(212, 175, 55, 0.03) 70px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, var(--dark-brown) 0%, var(--brown) 100%);
+    padding: 2rem 2rem 1rem;
+    box-shadow: 0 4px 20px var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--gold);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    animation: fadeInDown 1s ease-out;
+}
+
+.logo-icon {
+    width: 80px;
+    height: 80px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.mosque-icon {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 8px rgba(212, 175, 55, 0.5));
+}
+
+.logo-text {
+    text-align: center;
+}
+
+.logo-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-shadow: 2px 2px 4px var(--shadow);
+    letter-spacing: 3px;
+    margin-bottom: 0.3rem;
+}
+
+.logo-subtitle {
+    font-size: 1.3rem;
+    color: var(--light-gold);
+    font-weight: 400;
+    letter-spacing: 2px;
+}
+
+/* Navegación */
+.nav-menu {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.nav-btn {
+    background: transparent;
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    padding: 0.8rem 1.5rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;
+    letter-spacing: 1px;
+}
+
+.nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-btn:hover::before {
+    left: 100%;
+}
+
+.nav-btn:hover {
+    background: var(--gold);
+    color: var(--dark-brown);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.nav-btn.active {
+    background: var(--gold);
+    color: var(--dark-brown);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.6);
+}
+
+/* Contenedor Principal */
+.main-container {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Secciones del Menú */
+.menu-section {
+    display: none;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.menu-section.active {
+    display: block;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-shadow: 3px 3px 6px var(--shadow);
+    margin-bottom: 1rem;
+    letter-spacing: 4px;
+    position: relative;
+    display: inline-block;
+    padding: 0 2rem;
+}
+
+.section-title::before,
+.section-title::after {
+    content: '✦';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 1.5rem;
+    opacity: 0.7;
+}
+
+.section-title::before {
+    left: 0;
+}
+
+.section-title::after {
+    right: 0;
+}
+
+.decorative-line {
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 1rem auto;
+    position: relative;
+}
+
+.decorative-line::before,
+.decorative-line::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    background: var(--gold);
+    border-radius: 50%;
+}
+
+.decorative-line::before {
+    left: -20px;
+}
+
+.decorative-line::after {
+    right: -20px;
+}
+
+/* Grid de Menú */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+}
+
+/* Items del Menú */
+.menu-item {
+    background: linear-gradient(135deg, rgba(245, 230, 211, 0.1) 0%, rgba(232, 213, 196, 0.05) 100%);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px var(--shadow);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid transparent;
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.menu-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+}
+
+.menu-item:hover::before {
+    opacity: 1;
+}
+
+.menu-item:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--gold);
+    box-shadow: 0 15px 35px rgba(212, 175, 55, 0.4);
+}
+
+.item-image {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.menu-item:hover .item-image img {
+    transform: scale(1.15) rotate(2deg);
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(26, 26, 26, 0.3) 100%);
+    transition: opacity 0.3s ease;
+}
+
+.menu-item:hover .image-overlay {
+    opacity: 0.7;
+}
+
+.item-content {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.item-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+    text-shadow: 1px 1px 2px var(--shadow);
+}
+
+.item-description {
+    font-size: 0.95rem;
+    color: var(--beige);
+    line-height: 1.6;
+    font-style: italic;
+}
+
+/* Footer */
+.footer {
+    background: linear-gradient(135deg, var(--dark-brown) 0%, var(--brown) 100%);
+    padding: 2rem;
+    text-align: center;
+    margin-top: 4rem;
+    border-top: 3px solid var(--gold);
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212, 175, 55, 0.1) 2px, rgba(212, 175, 55, 0.1) 4px);
+    opacity: 0.3;
+}
+
+.footer-text {
+    position: relative;
+    z-index: 1;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--light-gold);
+    letter-spacing: 2px;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Animaciones de entrada para items */
+.menu-item[data-aos] {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+}
+
+.menu-item[data-aos].aos-animate {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .logo-title {
+        font-size: 1.8rem;
+    }
+    
+    .logo-subtitle {
+        font-size: 1rem;
+    }
+    
+    .logo-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+        padding: 0 1rem;
+    }
+    
+    .menu-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .nav-menu {
+        gap: 0.5rem;
+    }
+    
+    .nav-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .header {
+        padding: 1.5rem 1rem 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .item-name {
+        font-size: 1.1rem;
+    }
+}
+
+/* Efectos de scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Decoración adicional - Patrones geométricos */
+.menu-item::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.menu-item:hover::after {
+    opacity: 1;
+}
+
+/* Efecto de brillo en hover */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.menu-item:hover .item-name {
+    background: linear-gradient(90deg, var(--gold) 0%, var(--light-gold) 50%, var(--gold) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2s linear infinite;
+}
+

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Árabe - Menú Digital</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header con Logo -->
+    <header class="header">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <svg viewBox="0 0 100 100" class="mosque-icon">
+                    <path d="M50 10 L60 20 L70 15 L65 25 L75 30 L60 35 L50 40 L40 35 L25 30 L35 25 L30 15 L40 20 Z" fill="#D4AF37"/>
+                    <rect x="45" y="40" width="10" height="50" fill="#8B4513"/>
+                    <rect x="40" y="50" width="20" height="5" fill="#654321"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <h1 class="logo-title">GOURMET ÁRABE</h1>
+                <p class="logo-subtitle">غوربینت عربي</p>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <button class="nav-btn active" data-section="entradas">Entradas</button>
+            <button class="nav-btn" data-section="platillos">Platillos</button>
+            <button class="nav-btn" data-section="acompanamiento">Acompañamiento</button>
+            <button class="nav-btn" data-section="bebestibles">Bebestibles</button>
+        </nav>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <main class="main-container">
+        <!-- Sección Entradas -->
+        <section id="entradas" class="menu-section active">
+            <div class="section-header">
+                <h2 class="section-title">ENTRADAS</h2>
+                <div class="decorative-line"></div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item" data-aos="fade-up">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&h=300&fit=crop" alt="Hummus" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">HUMMUS CON PAN</h3>
+                        <p class="item-description">Cremoso hummus tradicional servido con pan árabe fresco</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Baba Ganoush" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">BABA GANOUSH CON PAN</h3>
+                        <p class="item-description">Berenjena ahumada con tahini y especias</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&h=300&fit=crop" alt="Falafel" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">FALAFEL PARA PICAR (6 UND.)</h3>
+                        <p class="item-description">Croquetas de garbanzos fritas, crujientes por fuera y suaves por dentro</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Kebab" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KEBBAB PARA PICAR (2 UNIDADES)</h3>
+                        <p class="item-description">Brochetas de carne marinada y especiada</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Kubbeh" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KUBBEH (5 UNID.)</h3>
+                        <p class="item-description">Croquetas de trigo bulgur rellenas de carne y especias</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="500">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Hojas de Parra" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">HOJAS DE PARRA - VEGANA Ó CARNE (12 UND.)</h3>
+                        <p class="item-description">Hojas de parra rellenas, disponibles en versión vegana o con carne</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="600">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Repollitos" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">REPOLLITOS - VEGANO Ó CARNE (10 UNID.)</h3>
+                        <p class="item-description">Repollitos rellenos, opción vegana o con carne</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Platillos -->
+        <section id="platillos" class="menu-section">
+            <div class="section-header">
+                <h2 class="section-title">PLATILLOS</h2>
+                <div class="decorative-line"></div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item" data-aos="fade-up">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Chorrillana" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">CHORRILLANA (CON 2 SALSAS A ELECCIÓN)</h3>
+                        <p class="item-description">Plato especial con dos salsas de tu elección</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Kebab Fajita" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KEBBAB - FAJITA</h3>
+                        <p class="item-description">Kebab servido en fajita con verduras frescas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Kebab con Arroz" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KEBBAB - PLATO CON ARROZ</h3>
+                        <p class="item-description">Kebab acompañado de arroz aromático</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Kebab con Arroz y Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KEBBAB - PLATO CON ARROZ Y PAPAS FRITAS</h3>
+                        <p class="item-description">Kebab con arroz y papas fritas crujientes</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Kebab con Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KEBBAB - PLATO CON PAPAS FRITAS</h3>
+                        <p class="item-description">Kebab servido con papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="500">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Kubbeh con Arroz" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KUBBEH - PLATO CON ARROZ</h3>
+                        <p class="item-description">Kubbeh acompañado de arroz</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="600">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Kubbeh con Arroz y Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KUBBEH - PLATO CON ARROZ Y PAPAS FRITAS</h3>
+                        <p class="item-description">Kubbeh con arroz y papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="700">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Kubbeh con Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KUBBEH - PLATO CON PAPAS FRITAS</h3>
+                        <p class="item-description">Kubbeh servido con papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="800">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Pollo Fajita" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - FAJITA (POLLO)</h3>
+                        <p class="item-description">Shawarma de pollo en fajita con verduras</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="900">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Carne Fajita" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - FAJITA (CARNE)</h3>
+                        <p class="item-description">Shawarma de carne en fajita con verduras</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1000">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Pollo con Arroz" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - AL PLATO (POLLO C/ ARRÓZ)</h3>
+                        <p class="item-description">Shawarma de pollo con arroz aromático</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1100">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Pollo con Arroz y Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - AL PLATO (POLLO C/ ARRÓZ Y PAPAS FRITAS)</h3>
+                        <p class="item-description">Shawarma de pollo con arroz y papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1200">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Carne con Arroz" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - AL PLATO (CARNE C/ ARRÓZ)</h3>
+                        <p class="item-description">Shawarma de carne con arroz aromático</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1300">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Carne con Arroz y Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - AL PLATO (CARNE C/ ARRÓZ Y PAPAS FRITAS)</h3>
+                        <p class="item-description">Shawarma de carne con arroz y papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1400">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Mixto con Arroz" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - AL PLATO (MIXTO C/ ARRÓZ)</h3>
+                        <p class="item-description">Shawarma mixto (pollo y carne) con arroz</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1500">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Shawarma Mixto con Arroz y Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">SHAWARMA - AL PLATO (MIXTO C/ ARRÓZ Y PAPAS FRITAS)</h3>
+                        <p class="item-description">Shawarma mixto con arroz y papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1600">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&h=300&fit=crop" alt="Falafel Fajita" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">FALAFEL - FAJITA VEGANO</h3>
+                        <p class="item-description">Falafel vegano en fajita con verduras frescas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1700">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&h=300&fit=crop" alt="Falafel con Arroz" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">FALAFEL - AL PLATO VEGANO (C/ ARRÓZ)</h3>
+                        <p class="item-description">Falafel vegano con arroz aromático</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1800">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&h=300&fit=crop" alt="Falafel con Arroz y Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">FALAFEL - AL PLATO VEGANO (C/ ARRÓZ Y PAPAS FRITAS)</h3>
+                        <p class="item-description">Falafel vegano con arroz y papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="1900">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&h=300&fit=crop" alt="Falafel con Papas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">FALAFEL - AL PLATO VEGANO (C/ PAPAS FRITAS)</h3>
+                        <p class="item-description">Falafel vegano con papas fritas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="2000">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Tabla Mixta Carne" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">TABLA MIXTA - CARNE</h3>
+                        <p class="item-description">Selección variada de platos de carne</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="2100">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1572441713132-51c75654db73?w=400&h=300&fit=crop" alt="Tabla Mixta Vegana" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">TABLA MIXTA - VEGANA</h3>
+                        <p class="item-description">Selección variada de platos veganos</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="2200">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400&h=300&fit=crop" alt="Kebab Guisado" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">KEBBAB GUISADO</h3>
+                        <p class="item-description">Kebab cocido lentamente en salsa especial</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="2300">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Musaka" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">MUSAKA</h3>
+                        <p class="item-description">Plato tradicional de berenjena, carne y bechamel</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="2400">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=300&fit=crop" alt="Papas Fritas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">PAPAS FRITAS (INDIVIDUAL)</h3>
+                        <p class="item-description">Papas fritas crujientes, porción individual</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="2500">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&h=300&fit=crop" alt="Papas Fritas Compartir" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">PAPAS FRITAS (PARA COMPARTIR)</h3>
+                        <p class="item-description">Papas fritas crujientes, porción para compartir</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Acompañamiento -->
+        <section id="acompanamiento" class="menu-section">
+            <div class="section-header">
+                <h2 class="section-title">ACOMPAÑAMIENTO - SALSAS</h2>
+                <div class="decorative-line"></div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item" data-aos="fade-up">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Salsa Ajo" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">AJO</h3>
+                        <p class="item-description">Salsa cremosa de ajo</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Salsa Cilantro" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">CILANTRO</h3>
+                        <p class="item-description">Salsa fresca de cilantro</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Salsa Albahaca" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">ALBAHACA</h3>
+                        <p class="item-description">Salsa aromática de albahaca</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=400&h=300&fit=crop" alt="Hummus" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">HUMMUS</h3>
+                        <p class="item-description">Cremoso hummus tradicional</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&h=300&fit=crop" alt="Baba Ganoush" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">BABA GANOUSH</h3>
+                        <p class="item-description">Berenjena ahumada con tahini</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección Bebestibles -->
+        <section id="bebestibles" class="menu-section">
+            <div class="section-header">
+                <h2 class="section-title">BEBESTIBLES</h2>
+                <div class="decorative-line"></div>
+            </div>
+            <div class="menu-grid">
+                <div class="menu-item" data-aos="fade-up">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop" alt="Té Verde" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">TETERA DE TÉ - VERDE</h3>
+                        <p class="item-description">Té verde aromático servido en tetera tradicional</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="100">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop" alt="Té Jamaica" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">TETERA DE TÉ - JAMAICA</h3>
+                        <p class="item-description">Té de jamaica refrescante servido en tetera</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="200">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&h=300&fit=crop" alt="Café Tradicional" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">CAFÉ TRADICIONAL</h3>
+                        <p class="item-description">Café árabe tradicional preparado a la manera clásica</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="300">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1517487881594-2787fef5ebf7?w=400&h=300&fit=crop" alt="Café Cardamomo" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">CAFÉ CARDAMOMO</h3>
+                        <p class="item-description">Café árabe con cardamomo, especiado y aromático</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="400">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1554866585-cd94860890b7?w=400&h=300&fit=crop" alt="Bebidas Lata" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">BEBIDAS LATA (VARIEDAD)</h3>
+                        <p class="item-description">Variedad de bebidas en lata</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="500">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1548839140-5a9415c5d1e0?w=400&h=300&fit=crop" alt="Agua Mineral con Gas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">AGUA MINERAL C/ GAS</h3>
+                        <p class="item-description">Agua mineral con gas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="600">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1548839140-5a9415c5d1e0?w=400&h=300&fit=crop" alt="Agua Mineral sin Gas" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">AGUA MINERAL S/GAS</h3>
+                        <p class="item-description">Agua mineral sin gas</p>
+                    </div>
+                </div>
+                <div class="menu-item" data-aos="fade-up" data-aos-delay="700">
+                    <div class="item-image">
+                        <img src="https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&h=300&fit=crop" alt="Jugos Naturales" loading="lazy">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="item-content">
+                        <h3 class="item-name">JUGOS NATURALES (VARIEDAD DE SABORES)</h3>
+                        <p class="item-description">Jugos naturales frescos en variedad de sabores</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-pattern"></div>
+        <p class="footer-text">Gourmet Árabe - Sabores Auténticos del Medio Oriente</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
