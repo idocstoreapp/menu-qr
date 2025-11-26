@@ -1,105 +1,179 @@
-# Menú Digital - Gourmet Árabe
+# Menú QR - Gourmet Árabe
 
-Un menú digital elegante y moderno con diseño inspirado en la cultura árabe, con animaciones suaves y múltiples secciones.
+Aplicación web moderna para gestión de menú digital con panel de administración, construida con Astro, React, Tailwind CSS y SQLite.
 
-## Características
+## 🚀 Características
 
-- ✨ **Diseño Árabe Auténtico**: Colores dorados, patrones geométricos y tipografía elegante
-- 🎨 **Animaciones Suaves**: Efectos de hover, transiciones y animaciones al hacer scroll
-- 📱 **Responsive**: Se adapta perfectamente a dispositivos móviles, tablets y escritorio
-- 🖼️ **Imágenes Ilustrativas**: Cada plato tiene su imagen asociada
-- 🧭 **Navegación Intuitiva**: Botones de navegación para cambiar entre secciones
-- ⚡ **Rendimiento Optimizado**: Lazy loading de imágenes y animaciones eficientes
+- ✨ **Panel de Administración**: Gestión completa de items del menú, precios, disponibilidad
+- 📱 **Vista Pública**: Menú digital elegante con diseño árabe para clientes
+- 🎨 **Diseño Árabe**: Colores dorados, tipografía elegante, animaciones suaves
+- 💾 **Base de Datos SQLite**: Almacenamiento local con Drizzle ORM
+- 🔐 **Autenticación**: Sistema de login seguro para administradores
+- 📊 **Gestión Completa**: Items individuales, menús combinados, promociones, menú del día
 
-## Estructura del Proyecto
+## 📋 Requisitos
+
+- Node.js 18+ 
+- npm o yarn
+
+## 🛠️ Instalación
+
+1. **Instalar dependencias:**
+```bash
+npm install
+```
+
+2. **Inicializar base de datos:**
+La base de datos se inicializa automáticamente al iniciar la aplicación.
+
+3. **Iniciar servidor de desarrollo:**
+```bash
+npm run dev
+```
+
+4. **Abrir en el navegador:**
+- Vista pública: http://localhost:4321
+- Panel admin: http://localhost:4321/admin/login
+
+## 🔑 Credenciales por Defecto
+
+- **Usuario:** `admin`
+- **Contraseña:** `admin123`
+
+⚠️ **IMPORTANTE:** Cambia la contraseña después del primer inicio de sesión.
+
+## 📁 Estructura del Proyecto
 
 ```
 menu-qr/
-├── index.html      # Estructura HTML del menú
-├── styles.css      # Estilos con diseño árabe y animaciones
-├── script.js       # JavaScript para navegación y animaciones
-└── README.md       # Este archivo
+├── src/
+│   ├── components/
+│   │   ├── admin/          # Componentes del panel admin
+│   │   └── public/         # Componentes de la vista pública
+│   ├── db/
+│   │   ├── schema.ts       # Esquema de base de datos
+│   │   └── index.ts        # Conexión y inicialización
+│   ├── layouts/
+│   │   ├── AdminLayout.astro
+│   │   └── PublicLayout.astro
+│   ├── lib/
+│   │   ├── auth.ts         # Funciones de autenticación
+│   │   └── api-helpers.ts  # Helpers para API
+│   └── pages/
+│       ├── api/            # Endpoints de la API
+│       ├── admin/          # Páginas del panel admin
+│       └── index.astro     # Página principal pública
+├── astro.config.mjs
+├── tailwind.config.mjs
+├── drizzle.config.ts
+└── package.json
 ```
 
-## Secciones del Menú
+## 🎯 Funcionalidades del Admin
 
-1. **Entradas**: Aperitivos y platos para compartir
-2. **Platillos**: Platos principales del restaurante
-3. **Acompañamiento - Salsas**: Salsas y acompañamientos
-4. **Bebestibles**: Bebidas calientes y frías
+### Gestión de Items del Menú
+- Crear, editar y eliminar items
+- Cambiar precios
+- Activar/desactivar disponibilidad
+- Marcar items como destacados
+- Asignar categorías
+- Subir imágenes
 
-## Cómo Usar
+### Menús Combinados
+- Crear menús para 2, 4, 6, 8 personas
+- Definir items incluidos
+- Establecer precios
 
-1. Abre el archivo `index.html` en tu navegador web
-2. Navega entre las diferentes secciones usando los botones en la parte superior
-3. Las imágenes se cargan automáticamente desde Unsplash (puedes reemplazarlas con tus propias imágenes)
+### Promociones
+- Crear promociones especiales
+- Definir fechas de validez
+- Precios con descuento
 
-## Personalización
+### Menú del Día
+- Configurar menú diario
+- Precio especial del día
 
-### Reemplazar Imágenes
+## 🌐 API Endpoints
 
-Para usar tus propias imágenes, reemplaza las URLs en el atributo `src` de las etiquetas `<img>` en `index.html`. Las imágenes deben tener un tamaño recomendado de 400x300px para mejor visualización.
+### Autenticación
+- `POST /api/login` - Iniciar sesión
+- `POST /api/logout` - Cerrar sesión
 
-Ejemplo:
-```html
-<img src="ruta/a/tu/imagen.jpg" alt="Nombre del plato" loading="lazy">
+### Items del Menú
+- `GET /api/menu-items` - Obtener todos los items
+- `POST /api/menu-items` - Crear item (requiere auth)
+- `PUT /api/menu-items` - Actualizar item (requiere auth)
+- `DELETE /api/menu-items?id=X` - Eliminar item (requiere auth)
+
+### Categorías
+- `GET /api/categories` - Obtener categorías
+- `POST /api/categories` - Crear categoría (requiere auth)
+
+### Menús Combinados
+- `GET /api/combo-menus` - Obtener menús combinados
+- `POST /api/combo-menus` - Crear menú (requiere auth)
+- `PUT /api/combo-menus` - Actualizar menú (requiere auth)
+- `DELETE /api/combo-menus?id=X` - Eliminar menú (requiere auth)
+
+### Promociones
+- `GET /api/promotions` - Obtener promociones activas
+- `POST /api/promotions` - Crear promoción (requiere auth)
+- `PUT /api/promotions` - Actualizar promoción (requiere auth)
+
+### Menú del Día
+- `GET /api/daily-menu?date=YYYY-MM-DD` - Obtener menú del día
+- `POST /api/daily-menu` - Crear menú del día (requiere auth)
+- `PUT /api/daily-menu` - Actualizar menú del día (requiere auth)
+
+## 🎨 Personalización
+
+### Colores
+Los colores están definidos en `tailwind.config.mjs`. Puedes modificar:
+- `gold`: Colores dorados principales
+- `terracotta`: Colores terracota
+- `arabic`: Colores oscuros y beige
+
+### Fuentes
+- **Cinzel**: Títulos y encabezados
+- **Playfair Display**: Texto general
+
+## 🚢 Despliegue
+
+### Vercel (Recomendado)
+
+1. **Subir a GitHub:**
+```bash
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/TU_USUARIO/menu-qr.git
+git push -u origin main
 ```
 
-### Modificar Colores
+2. **Conectar con Vercel:**
+   - Ve a [vercel.com](https://vercel.com)
+   - Conecta tu repositorio de GitHub
+   - Vercel detectará automáticamente Astro
+   - Configura variables de entorno si es necesario
+   - Deploy automático
 
-Los colores están definidos como variables CSS en `styles.css`. Puedes modificarlos en la sección `:root`:
+### Variables de Entorno
 
-```css
-:root {
-    --gold: #D4AF37;           /* Color dorado principal */
-    --terracotta: #C17A4A;     /* Color terracota */
-    --beige: #F5E6D3;          /* Color beige */
-    /* ... más colores */
-}
+Crea un archivo `.env` para producción:
+```
+JWT_SECRET=tu-secret-key-super-seguro-aqui
 ```
 
-### Agregar o Modificar Platos
+## 📝 Notas
 
-Simplemente copia y pega un bloque de `.menu-item` en la sección correspondiente y modifica el contenido:
+- La base de datos SQLite se crea automáticamente en la raíz del proyecto
+- En producción, considera usar una base de datos más robusta (PostgreSQL, MySQL)
+- Las imágenes pueden ser URLs externas o subidas a un servicio de almacenamiento
+- El JWT_SECRET debe ser cambiado en producción
 
-```html
-<div class="menu-item" data-aos="fade-up">
-    <div class="item-image">
-        <img src="imagen.jpg" alt="Nombre" loading="lazy">
-        <div class="image-overlay"></div>
-    </div>
-    <div class="item-content">
-        <h3 class="item-name">NOMBRE DEL PLATO</h3>
-        <p class="item-description">Descripción del plato</p>
-    </div>
-</div>
-```
-
-## Tecnologías Utilizadas
-
-- HTML5
-- CSS3 (con animaciones y gradientes)
-- JavaScript (Vanilla JS, sin dependencias)
-- Google Fonts (Cinzel y Playfair Display)
-
-## Navegadores Compatibles
-
-- Chrome (últimas versiones)
-- Firefox (últimas versiones)
-- Safari (últimas versiones)
-- Edge (últimas versiones)
-
-## Notas
-
-- Las imágenes actuales son placeholders de Unsplash. Reemplázalas con imágenes reales de tus platos para mejor presentación.
-- El diseño es completamente responsive y se adapta a diferentes tamaños de pantalla.
-- Las animaciones están optimizadas para un rendimiento fluido.
-
-## Licencia
+## 📄 Licencia
 
 Este proyecto es de uso libre para tu restaurante.
 
 ---
 
 **Gourmet Árabe** - Sabores Auténticos del Medio Oriente
-

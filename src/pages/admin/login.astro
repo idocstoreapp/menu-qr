@@ -1,0 +1,13 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import LoginForm from '../../components/admin/LoginForm';
+import { initDatabase } from '../../db/index';
+
+await initDatabase();
+---
+
+<AdminLayout title="Iniciar Sesión">
+  <LoginForm client:load />
+</AdminLayout>
+
+

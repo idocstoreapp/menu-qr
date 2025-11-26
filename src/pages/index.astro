@@ -1,0 +1,120 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+import { initDatabase } from '../db/index';
+import { db } from '../db/index';
+import { categories, menuItems } from '../db/schema';
+import { eq, asc } from 'drizzle-orm';
+import { seedData } from '../scripts/seed-data';
+
+await initDatabase();
+
+// Verificar si hay items en la base de datos, si no, cargar datos
+let itemCount = [];
+try {
+  itemCount = await db.select().from(menuItems).limit(1);
+} catch (error) {
+  console.error('Error verificando items:', error);
+}
+
+if (itemCount.length === 0) {
+  console.log('📦 Base de datos vacía, cargando datos iniciales...');
+  try {
+    await seedData();
+    console.log('✅ Datos cargados correctamente');
+    // Recargar categorías después de cargar datos
+    activeCategories = await db.select().from(categories)
+      .where(eq(categories.isActive, true))
+      .orderBy(asc(categories.order), asc(categories.name));
+  } catch (error: any) {
+    console.error('❌ Error cargando datos:', error.message || error);
+  }
+} else {
+  console.log(`✅ Base de datos tiene ${itemCount.length > 0 ? 'items' : '0 items'}`);
+}
+
+// Obtener categorías activas
+let activeCategories = [];
+try {
+  activeCategories = await db.select().from(categories)
+    .where(eq(categories.isActive, true))
+    .orderBy(asc(categories.order), asc(categories.name));
+} catch (error) {
+  console.error('Error loading categories:', error);
+  activeCategories = [];
+}
+---
+
+<PublicLayout title="Menú Digital - Gourmet Árabe">
+  <div class="min-h-screen flex items-center justify-center bg-black">
+    <div class="text-center">
+      <div class="mb-8">
+        <div class="w-48 h-48 md:w-64 md:h-64 mx-auto mb-8 animate-float">
+          <img 
+            src="/logo-cropped.png" 
+            alt="Gourmet Árabe Logo" 
+            class="w-full h-full object-contain rounded-full shadow-2xl"
+            style="box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);"
+          />
+        </div>
+      </div>
+
+      {activeCategories.length > 0 ? (
+        <div class="space-y-4">
+          <p class="text-gold-300 text-xl mb-6">Selecciona una categoría del menú:</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {activeCategories.map((category) => (
+              <a
+                href={`/${category.slug}`}
+                class="px-6 py-4 bg-gold-600 hover:bg-gold-500 text-black font-bold rounded-lg transition transform hover:scale-105 shadow-lg border-2 border-gold-400 hover:border-gold-300 text-lg"
+              >
+                {category.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-gold-400 text-xl mb-4">No hay categorías disponibles</p>
+          <p class="text-gold-300 mb-6">Cargando datos iniciales del menú...</p>
+          <button 
+            id="load-data-btn"
+            class="px-6 py-3 bg-gold-600 hover:bg-gold-500 text-black font-bold rounded-lg transition"
+          >
+            Cargar Datos del Menú
+          </button>
+          <p class="text-gold-300 text-sm mt-4">O inicia sesión en el <a href="/admin/login" class="text-gold-400 hover:text-gold-300 underline">panel de administración</a></p>
+        </div>
+      )}
+    </div>
+  </div>
+</PublicLayout>
+
+<script>
+  // Botón para cargar datos manualmente
+  const loadBtn = document.getElementById('load-data-btn');
+  if (loadBtn) {
+    loadBtn.addEventListener('click', async () => {
+      loadBtn.disabled = true;
+      loadBtn.textContent = 'Cargando...';
+      try {
+        const response = await fetch('/api/seed');
+        const data = await response.json();
+        if (data.success) {
+          alert('✅ Datos cargados correctamente. Recarga la página.');
+          window.location.reload();
+        } else {
+          alert('Error: ' + (data.error || 'No se pudieron cargar los datos'));
+          loadBtn.disabled = false;
+          loadBtn.textContent = 'Cargar Datos del Menú';
+        }
+      } catch (error) {
+        alert('Error al cargar datos: ' + error);
+        loadBtn.disabled = false;
+        loadBtn.textContent = 'Cargar Datos del Menú';
+      }
+    });
+  }
+</script>
+
+
+
