@@ -2,8 +2,16 @@ import { createClient } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
 import * as schema from './schema';
 
+// Usar variable de entorno para la URL de la base de datos
+// En desarrollo: file:./database.sqlite
+// En producción (Vercel): usar Turso o variable de entorno
+// Fallback en Vercel: usar /tmp (se perderá en cada deploy)
+const isProduction = import.meta.env.PROD;
+const databaseUrl = import.meta.env.DATABASE_URL || 
+  (isProduction ? 'file:/tmp/database.sqlite' : 'file:./database.sqlite');
+
 const client = createClient({
-  url: 'file:./database.sqlite',
+  url: databaseUrl,
 });
 
 export const db = drizzle(client, { schema });

@@ -39,17 +39,40 @@ git push -u origin main
 
 ## Paso 2: Desplegar en Vercel
 
+### ⚠️ IMPORTANTE: Base de Datos en Vercel
+
+Vercel usa un sistema de archivos de solo lectura, por lo que SQLite local no funcionará. Tienes dos opciones:
+
+#### Opción 1: Usar Turso (Recomendado - Gratis)
+
+1. Crea una cuenta en [Turso](https://turso.tech)
+2. Crea una base de datos nueva
+3. Obtén la URL de conexión (formato: `libsql://...`)
+4. En Vercel, agrega la variable de entorno:
+   - Nombre: `DATABASE_URL`
+   - Valor: La URL de Turso
+
+#### Opción 2: Usar SQLite en `/tmp` (Limitado)
+
+La base de datos se reiniciará en cada deploy. Solo para pruebas.
+
+---
+
+### Desplegar en Vercel
+
 ### Opción A: Desde GitHub (Recomendado)
 
 1. Ve a [vercel.com](https://vercel.com)
 2. Inicia sesión con tu cuenta de GitHub
 3. Haz clic en "Add New Project"
 4. Selecciona el repositorio `menu-qr`
-5. Vercel detectará automáticamente que es un sitio estático
+5. Vercel detectará automáticamente que es un proyecto Astro
 6. **Configuración:**
-   - Framework Preset: **Other** (o déjalo en auto)
-   - Build Command: (déjalo vacío - no necesitamos build)
-   - Output Directory: (déjalo vacío - los archivos están en la raíz)
+   - Framework Preset: **Astro** (debería detectarse automáticamente)
+   - Build Command: `npm run build` (automático)
+   - Output Directory: `.vercel/output` (automático)
+   - **Variables de Entorno:**
+     - `DATABASE_URL`: URL de tu base de datos Turso (si usas Opción 1)
 7. Haz clic en "Deploy"
 8. ¡Listo! Vercel te dará una URL como: `menu-qr.vercel.app`
 
@@ -102,10 +125,12 @@ git push
 
 ## Notas Importantes
 
-- **No necesitas** archivos de configuración especiales para Vercel con este proyecto
-- Vercel detecta automáticamente que es HTML/CSS/JS estático
+- **Este proyecto usa Astro con modo servidor** (SSR)
+- Vercel detecta automáticamente Astro y usa el adaptador correcto
 - El sitio se actualiza automáticamente cada vez que haces `git push` (si conectaste GitHub)
+- **Base de datos**: En producción, usa Turso o una base de datos en la nube
 - Puedes usar la URL de Vercel para generar tu código QR del menú
+- El archivo `vercel.json` está configurado para el build correcto
 
 ---
 
