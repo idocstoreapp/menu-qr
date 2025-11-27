@@ -3,6 +3,7 @@ import { db } from '../../db/index';
 import { menuItems, categories } from '../../db/schema';
 import { eq, and, asc } from 'drizzle-orm';
 import { requireAuth, jsonResponse, errorResponse, getAuthUser } from '../../lib/api-helpers';
+import { createClient } from '@libsql/client';
 
 // GET - Obtener todos los items (público si están disponibles)
 export const GET: APIRoute = async ({ url }) => {
@@ -10,44 +11,81 @@ export const GET: APIRoute = async ({ url }) => {
     const categoryId = url.searchParams.get('categoryId');
     const availableOnly = url.searchParams.get('availableOnly') !== 'false';
 
-    // Construir condiciones where
-    const conditions = [];
+    // Asegurar que la base de datos esté migrada antes de consultar
+    const { initDatabase } = await import('../../db/index');
+    try {
+      await initDatabase();
+    } catch (migrationError: any) {
+      console.log('⚠️ Error en migración (puede ser normal):', migrationError.message);
+      // Continuar aunque falle la migración
+    }
+
+    // Usar SQL directo para ser más robusto con columnas opcionales
+    const isProduction = import.meta.env.PROD;
+    const databaseUrl = import.meta.env.DATABASE_URL || 
+      (isProduction ? 'file:/tmp/database.sqlite' : 'file:./database.sqlite');
+    const authToken = import.meta.env.TURSO_AUTH_TOKEN;
+    
+    const client = createClient({
+      url: databaseUrl,
+      ...(authToken && { authToken }),
+    });
+
+    // Verificar si existe la columna video_url
+    const tableInfo = await client.execute({
+      sql: `PRAGMA table_info(menu_items)`,
+    });
+    const hasVideoUrl = tableInfo.rows.some((row: any) => row.name === 'video_url');
+    
+    let sql = `
+      SELECT 
+        mi.id,
+        mi.name,
+        mi.description,
+        mi.price,
+        mi.category_id as categoryId,
+        mi.image_url as imageUrl,
+        ${hasVideoUrl ? 'mi.video_url as videoUrl,' : 'NULL as videoUrl,'}
+        mi.is_available as isAvailable,
+        mi.is_featured as isFeatured,
+        mi."order",
+        c.id as category_id,
+        c.name as category_name,
+        c.slug as category_slug
+      FROM menu_items mi
+      LEFT JOIN categories c ON mi.category_id = c.id
+      WHERE 1=1
+    `;
+    
+    const args: any[] = [];
     if (availableOnly) {
-      conditions.push(eq(menuItems.isAvailable, true));
+      sql += ` AND mi.is_available = 1`;
     }
     if (categoryId) {
-      conditions.push(eq(menuItems.categoryId, parseInt(categoryId)));
+      sql += ` AND mi.category_id = ?`;
+      args.push(parseInt(categoryId));
     }
-
-    let query = db.select({
-      id: menuItems.id,
-      name: menuItems.name,
-      description: menuItems.description,
-      price: menuItems.price,
-      categoryId: menuItems.categoryId,
-      imageUrl: menuItems.imageUrl,
-      videoUrl: menuItems.videoUrl,
-      isAvailable: menuItems.isAvailable,
-      isFeatured: menuItems.isFeatured,
-      order: menuItems.order,
-      category: {
-        id: categories.id,
-        name: categories.name,
-        slug: categories.slug,
-      },
-    })
-    .from(menuItems)
-    .leftJoin(categories, eq(menuItems.categoryId, categories.id));
-
-    if (conditions.length > 0) {
-      if (conditions.length === 1) {
-        query = query.where(conditions[0]);
-      } else {
-        query = query.where(and(...conditions));
-      }
-    }
-
-    const items = await query.orderBy(asc(menuItems.order), asc(menuItems.name));
+    
+    sql += ` ORDER BY mi."order" ASC, mi.name ASC`;
+    
+    const result = await client.execute({ sql, args });
+    const items = result.rows.map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      price: row.price,
+      categoryId: row.categoryId,
+      imageUrl: row.imageUrl,
+      videoUrl: row.videoUrl || null,
+      isAvailable: row.isAvailable === 1,
+      isFeatured: row.isFeatured === 1,
+      order: row.order,
+      category: row.category_id ? {
+        id: row.category_id,
+        name: row.category_name,
+        slug: row.category_slug,
+      } : null,
+    }));
     
     console.log(`API: Devolviendo ${items.length} items para categoría ${categoryId || 'todas'}`);
 

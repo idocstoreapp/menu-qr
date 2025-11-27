@@ -94,6 +94,28 @@ export async function initDatabase() {
     await client.execute(sql);
   }
 
+  // Migración: Agregar columna video_url si no existe (para bases de datos existentes)
+  try {
+    // Verificar si la columna existe consultando el schema
+    const tableInfo = await client.execute({
+      sql: `PRAGMA table_info(menu_items)`,
+    });
+    
+    const hasVideoUrl = tableInfo.rows.some((row: any) => row.name === 'video_url');
+    
+    if (!hasVideoUrl) {
+      console.log('🔄 Agregando columna video_url a menu_items...');
+      await client.execute({
+        sql: `ALTER TABLE menu_items ADD COLUMN video_url TEXT`,
+      });
+      console.log('✅ Columna video_url agregada correctamente');
+    }
+  } catch (error: any) {
+    // Si falla, puede ser que la tabla no exista aún o que la columna ya exista
+    // No es crítico, continuar
+    console.log('ℹ️ Migración video_url:', error.message || 'Columna ya existe o tabla no existe');
+  }
+
   // Crear usuario admin por defecto (password: admin123)
   // Nota: En producción, cambiar esta contraseña
   const bcrypt = await import('bcryptjs');
