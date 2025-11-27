@@ -25,7 +25,7 @@ const currentCategory = allCategories.find(cat => cat.slug === categorySlug) || 
 ---
 
 <PublicLayout title={`${currentCategory?.name || 'Menú'} - Gourmet Árabe`}>
-  <header class="sticky top-0 z-50 bg-black border-b-4 border-gold-600 shadow-lg">
+  <header class="sticky top-0 z-50 bg-black/70 backdrop-blur-sm border-b-4 border-gold-600 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 py-6">
       <div class="flex items-center justify-center gap-4 mb-6">
         <div class="w-24 h-24 md:w-28 md:h-28 animate-float">
@@ -55,7 +55,7 @@ const currentCategory = allCategories.find(cat => cat.slug === categorySlug) || 
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8 bg-black min-h-screen">
+  <main class="max-w-7xl mx-auto px-4 py-8 min-h-screen">
     {currentCategory ? (
       currentCategory.slug === 'menus-combinados' ? (
         <ComboMenusSection client:load />
@@ -72,7 +72,7 @@ const currentCategory = allCategories.find(cat => cat.slug === categorySlug) || 
     )}
   </main>
 
-  <footer class="bg-black border-t-4 border-gold-600 mt-16 py-8">
+  <footer class="bg-black/70 backdrop-blur-sm border-t-4 border-gold-600 mt-16 py-8">
     <div class="max-w-7xl mx-auto px-4 text-center">
         <p class="text-gold-400 font-playfair text-lg">
           Gourmet Árabe - Sabores Auténticos del Medio Oriente

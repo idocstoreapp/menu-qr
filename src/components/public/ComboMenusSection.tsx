@@ -43,12 +43,12 @@ export default function ComboMenusSection() {
   return (
     <section className="mb-16">
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-cinzel text-gold-400 mb-4 relative inline-block">
-          <span className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 text-2xl opacity-70">✦</span>
+        <h2 className="text-4xl font-cinzel text-gold-400 mb-4 relative inline-block px-8 py-4 bg-black/80 backdrop-blur-md rounded-lg border-2 border-gold-600" style={{textShadow: '0 0 10px rgba(212, 175, 55, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.8)'}}>
+          <span className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 text-2xl text-gold-400 opacity-90">✦</span>
           MENÚS COMBINADOS
-          <span className="absolute right-0 top-1/2 translate-x-full -translate-y-1/2 text-2xl opacity-70">✦</span>
+          <span className="absolute right-0 top-1/2 translate-x-full -translate-y-1/2 text-2xl text-gold-400 opacity-90">✦</span>
         </h2>
-        <div className="w-48 h-1 bg-gradient-to-r from-transparent via-gold-600 to-transparent mx-auto"></div>
+        <div className="w-48 h-1 bg-gradient-to-r from-transparent via-gold-600 to-transparent mx-auto mt-2"></div>
       </div>
 
       {combos.length === 0 ? (

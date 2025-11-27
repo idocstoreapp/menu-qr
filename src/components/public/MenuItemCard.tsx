@@ -20,7 +20,7 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg overflow-hidden border-2 border-gold-600 hover:border-gold-400 transition-all duration-300 hover:scale-105 hover:shadow-xl" style={{boxShadow: '0 0 15px rgba(212, 175, 55, 0.3)'}}>
+    <div className="bg-black/50 backdrop-blur-sm rounded-lg overflow-hidden border-2 border-gold-600 hover:border-gold-400 transition-all duration-300 hover:scale-105 hover:shadow-xl" style={{boxShadow: '0 0 15px rgba(212, 175, 55, 0.3)'}}>
       {item.imageUrl && (
         <div className="h-48 overflow-hidden">
           <img
