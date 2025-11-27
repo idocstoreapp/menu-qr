@@ -27,6 +27,7 @@ export const menuItems = sqliteTable('menu_items', {
   price: real('price').notNull(),
   categoryId: integer('category_id').references(() => categories.id),
   imageUrl: text('image_url'),
+  videoUrl: text('video_url'), // URL del video corto (3 segundos)
   isAvailable: integer('is_available', { mode: 'boolean' }).notNull().default(true),
   isFeatured: integer('is_featured', { mode: 'boolean' }).notNull().default(false),
   order: integer('order').notNull().default(0),

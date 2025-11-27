@@ -26,6 +26,7 @@ export const GET: APIRoute = async ({ url }) => {
       price: menuItems.price,
       categoryId: menuItems.categoryId,
       imageUrl: menuItems.imageUrl,
+      videoUrl: menuItems.videoUrl,
       isAvailable: menuItems.isAvailable,
       isFeatured: menuItems.isFeatured,
       order: menuItems.order,
@@ -63,7 +64,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     requireAuth({ cookies } as any);
 
     const data = await request.json();
-    const { name, description, price, categoryId, imageUrl, isAvailable, isFeatured, order } = data;
+    const { name, description, price, categoryId, imageUrl, videoUrl, isAvailable, isFeatured, order } = data;
 
     if (!name || !price) {
       return errorResponse('Nombre y precio son requeridos', 400);
@@ -75,6 +76,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       price: parseFloat(price),
       categoryId: categoryId ? parseInt(categoryId) : null,
       imageUrl: imageUrl || null,
+      videoUrl: videoUrl || null,
       isAvailable: isAvailable !== false,
       isFeatured: isFeatured || false,
       order: order || 0,
@@ -112,6 +114,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     if (updates.price !== undefined) updateData.price = parseFloat(updates.price);
     if (updates.categoryId !== undefined) updateData.categoryId = updates.categoryId ? parseInt(updates.categoryId) : null;
     if (updates.imageUrl !== undefined) updateData.imageUrl = updates.imageUrl || null;
+    if (updates.videoUrl !== undefined) updateData.videoUrl = updates.videoUrl || null;
     if (updates.isAvailable !== undefined) updateData.isAvailable = updates.isAvailable;
     if (updates.isFeatured !== undefined) updateData.isFeatured = updates.isFeatured;
     if (updates.order !== undefined) updateData.order = parseInt(updates.order) || 0;

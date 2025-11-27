@@ -46,6 +46,7 @@ export async function initDatabase() {
       price REAL NOT NULL,
       category_id INTEGER,
       image_url TEXT,
+      video_url TEXT,
       is_available INTEGER NOT NULL DEFAULT 1,
       is_featured INTEGER NOT NULL DEFAULT 0,
       "order" INTEGER NOT NULL DEFAULT 0,

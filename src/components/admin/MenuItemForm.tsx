@@ -7,6 +7,7 @@ interface MenuItem {
   price: number;
   categoryId?: number;
   imageUrl?: string;
+  videoUrl?: string;
   isAvailable: boolean;
   isFeatured: boolean;
   order: number;
@@ -32,6 +33,7 @@ export default function MenuItemForm({ item, categories, onSave, onCancel }: Men
     price: 0,
     categoryId: undefined,
     imageUrl: '',
+    videoUrl: '',
     isAvailable: true,
     isFeatured: false,
     order: 0,
@@ -97,15 +99,30 @@ export default function MenuItemForm({ item, categories, onSave, onCancel }: Men
         </div>
       </div>
 
-      <div>
-        <label className="block text-gold-400 mb-2">URL de Imagen</label>
-        <input
-          type="url"
-          value={formData.imageUrl || ''}
-          onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-          className="w-full px-4 py-2 bg-arabic-brown text-cream rounded border border-gold-600 focus:border-gold-400 focus:outline-none"
-          placeholder="https://..."
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gold-400 mb-2">URL de Imagen</label>
+          <input
+            type="url"
+            value={formData.imageUrl || ''}
+            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+            className="w-full px-4 py-2 bg-arabic-brown text-cream rounded border border-gold-600 focus:border-gold-400 focus:outline-none"
+            placeholder="https://..."
+          />
+          <p className="text-beige text-xs mt-1">Se mostrará si no hay video</p>
+        </div>
+
+        <div>
+          <label className="block text-gold-400 mb-2">URL de Video (3 seg)</label>
+          <input
+            type="url"
+            value={formData.videoUrl || ''}
+            onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+            className="w-full px-4 py-2 bg-arabic-brown text-cream rounded border border-gold-600 focus:border-gold-400 focus:outline-none"
+            placeholder="https://..."
+          />
+          <p className="text-beige text-xs mt-1">Video corto (prioridad sobre imagen)</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
