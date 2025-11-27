@@ -3,16 +3,28 @@ import { db } from '../db/index';
 import { menuItems, categories, comboMenus, dailyMenu } from '../db/schema';
 import { initDatabase } from '../db/index';
 
-export async function seedData() {
+export async function seedData(forceClean: boolean = false) {
   await initDatabase();
   
-  // Limpiar datos existentes (opcional - solo para desarrollo)
-  try {
-    await db.delete(menuItems);
-    await db.delete(comboMenus);
-    console.log('✅ Datos anteriores eliminados');
-  } catch (error) {
-    console.log('No hay datos anteriores para eliminar');
+  // Verificar si ya hay datos
+  const existingItems = await db.select().from(menuItems).limit(1);
+  const hasData = existingItems.length > 0;
+  
+  // Solo limpiar si se fuerza o si no hay datos
+  if (forceClean || !hasData) {
+    if (forceClean && hasData) {
+      console.log('🧹 Limpiando datos existentes (modo forzado)...');
+      try {
+        await db.delete(menuItems);
+        await db.delete(comboMenus);
+        console.log('✅ Datos anteriores eliminados');
+      } catch (error) {
+        console.log('⚠️ Error eliminando datos:', error);
+      }
+    } else if (hasData) {
+      console.log('ℹ️ Ya hay datos en la base de datos. Usa forceClean=true para reemplazarlos.');
+      return;
+    }
   }
   
   // Obtener categorías
@@ -80,8 +92,13 @@ export async function seedData() {
     { name: 'Jugos Naturales (Variedad de Sabores)', description: 'Jugos naturales frescos en variedad de sabores', price: 0, categoryId: catMap['bebestibles'], order: 8 },
   ];
 
+  // Obtener items existentes para evitar duplicados
+  const existingItems = await db.select({ name: menuItems.name }).from(menuItems);
+  const existingNames = new Set(existingItems.map(item => item.name.toLowerCase().trim()));
+  
   // Insertar items
   let insertedCount = 0;
+  let skippedCount = 0;
   let errorCount = 0;
   
   for (const item of items) {
@@ -90,6 +107,13 @@ export async function seedData() {
         console.warn(`⚠️ Item sin categoría: ${item.name}`);
         errorCount++;
         continue;
+      }
+      
+      // Verificar si el item ya existe
+      const itemNameLower = item.name.toLowerCase().trim();
+      if (existingNames.has(itemNameLower)) {
+        skippedCount++;
+        continue; // Saltar si ya existe
       }
       
       await db.insert(menuItems).values({
@@ -104,13 +128,22 @@ export async function seedData() {
         updatedAt: new Date(),
       });
       insertedCount++;
+      existingNames.add(itemNameLower); // Agregar a la lista para evitar duplicados en la misma ejecución
     } catch (error: any) {
+      // Si el error es por duplicado, ignorarlo
+      if (error.message?.includes('UNIQUE') || error.message?.includes('duplicate')) {
+        skippedCount++;
+        continue;
+      }
       console.error(`❌ Error insertando ${item.name}:`, error.message);
       errorCount++;
     }
   }
   
   console.log(`✅ Items insertados: ${insertedCount} de ${items.length}`);
+  if (skippedCount > 0) {
+    console.log(`ℹ️ Items omitidos (ya existen): ${skippedCount}`);
+  }
   if (errorCount > 0) {
     console.warn(`⚠️ Errores: ${errorCount}`);
   }
@@ -191,9 +224,21 @@ export async function seedData() {
     },
   ];
 
+  // Obtener combos existentes para evitar duplicados
+  const existingCombos = await db.select({ name: comboMenus.name }).from(comboMenus);
+  const existingComboNames = new Set(existingCombos.map(combo => combo.name.toLowerCase().trim()));
+  
   let comboCount = 0;
+  let comboSkipped = 0;
   for (const combo of combos) {
     try {
+      // Verificar si el combo ya existe
+      const comboNameLower = combo.name.toLowerCase().trim();
+      if (existingComboNames.has(comboNameLower)) {
+        comboSkipped++;
+        continue; // Saltar si ya existe
+      }
+      
       await db.insert(comboMenus).values({
         ...combo,
         isAvailable: true,
@@ -201,12 +246,21 @@ export async function seedData() {
         updatedAt: new Date(),
       });
       comboCount++;
+      existingComboNames.add(comboNameLower); // Agregar a la lista para evitar duplicados en la misma ejecución
     } catch (error: any) {
+      // Si el error es por duplicado, ignorarlo
+      if (error.message?.includes('UNIQUE') || error.message?.includes('duplicate')) {
+        comboSkipped++;
+        continue;
+      }
       console.error(`❌ Error insertando combo ${combo.name}:`, error.message);
     }
   }
   
   console.log(`✅ Menús combinados insertados: ${comboCount} de ${combos.length}`);
+  if (comboSkipped > 0) {
+    console.log(`ℹ️ Combos omitidos (ya existen): ${comboSkipped}`);
+  }
   console.log('✅ Datos iniciales cargados correctamente');
   
   // Verificar que los datos se insertaron

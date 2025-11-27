@@ -27,14 +27,19 @@ if (dbInitialized) {
     console.error('Error verificando items:', error);
   }
 
-  if (itemCount.length === 0) {
-    console.log('📦 Base de datos vacía, cargando datos iniciales...');
+  // Solo cargar datos si la base de datos está realmente vacía
+  // NO ejecutar automáticamente en producción para evitar duplicados
+  const isProduction = import.meta.env.PROD;
+  if (itemCount.length === 0 && !isProduction) {
+    console.log('📦 Base de datos vacía (desarrollo), cargando datos iniciales...');
     try {
-      await seedData();
+      await seedData(false); // No forzar limpieza
       console.log('✅ Datos cargados correctamente');
     } catch (error: any) {
       console.error('❌ Error cargando datos:', error.message || error);
     }
+  } else if (itemCount.length === 0 && isProduction) {
+    console.log('⚠️ Base de datos vacía en producción. Usa /api/seed para cargar datos manualmente.');
   }
 
   // Obtener categorías activas
