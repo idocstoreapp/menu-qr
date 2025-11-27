@@ -68,8 +68,6 @@ export async function seedData() {
     { name: 'Salsa de Ajo', description: 'Salsa cremosa de ajo', price: 0, categoryId: catMap['acompanamiento-salsas'], order: 1 },
     { name: 'Salsa de Cilantro', description: 'Salsa fresca de cilantro', price: 0, categoryId: catMap['acompanamiento-salsas'], order: 2 },
     { name: 'Salsa de Albahaca', description: 'Salsa aromática de albahaca', price: 0, categoryId: catMap['acompanamiento-salsas'], order: 3 },
-    { name: 'Hummus', description: 'Cremoso hummus tradicional', price: 0, categoryId: catMap['acompanamiento-salsas'], order: 4 },
-    { name: 'Baba Ganoush', description: 'Berenjena ahumada con tahini', price: 0, categoryId: catMap['acompanamiento-salsas'], order: 5 },
 
     // Bebestibles
     { name: 'Tetera de Té Verde', description: 'Té verde aromático servido en tetera tradicional', price: 0, categoryId: catMap['bebestibles'], order: 1 },

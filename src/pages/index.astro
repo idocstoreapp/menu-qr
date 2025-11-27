@@ -65,7 +65,7 @@ if (dbInitialized) {
 
       {activeCategories.length > 0 ? (
         <div class="space-y-4">
-          <p class="text-gold-300 text-xl mb-6">Selecciona una categoría del menú:</p>
+          <p class="text-gold-300 text-xl mb-6 px-6 py-3 bg-black/70 backdrop-blur-sm rounded-lg border-2 border-gold-600 inline-block mx-auto" style="text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.8);">Selecciona una categoría del menú:</p>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {activeCategories.map((category) => (
               <a
@@ -79,15 +79,15 @@ if (dbInitialized) {
         </div>
       ) : (
         <div class="text-center py-12">
-          <p class="text-gold-400 text-xl mb-4">No hay categorías disponibles</p>
-          <p class="text-gold-300 mb-6">Cargando datos iniciales del menú...</p>
+          <p class="text-gold-400 text-xl mb-4 px-6 py-3 bg-black/70 backdrop-blur-sm rounded-lg border-2 border-gold-600 inline-block" style="text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.8);">No hay categorías disponibles</p>
+          <p class="text-gold-300 mb-6 px-4 py-2 bg-black/60 backdrop-blur-sm rounded-lg inline-block">Cargando datos iniciales del menú...</p>
           <button 
             id="load-data-btn"
             class="px-6 py-3 bg-gold-600 hover:bg-gold-500 text-black font-bold rounded-lg transition"
           >
             Cargar Datos del Menú
           </button>
-          <p class="text-gold-300 text-sm mt-4">O inicia sesión en el <a href="/admin/login" class="text-gold-400 hover:text-gold-300 underline">panel de administración</a></p>
+          <p class="text-gold-300 text-sm mt-4 px-4 py-2 bg-black/60 backdrop-blur-sm rounded-lg inline-block">O inicia sesión en el <a href="/admin/login" class="text-gold-400 hover:text-gold-300 underline">panel de administración</a></p>
         </div>
       )}
     </div>
