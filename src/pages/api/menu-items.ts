@@ -102,14 +102,23 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
       return errorResponse('ID es requerido', 400);
     }
 
+    // Construir objeto de actualización solo con los campos presentes
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    if (updates.name !== undefined) updateData.name = updates.name;
+    if (updates.description !== undefined) updateData.description = updates.description || null;
+    if (updates.price !== undefined) updateData.price = parseFloat(updates.price);
+    if (updates.categoryId !== undefined) updateData.categoryId = updates.categoryId ? parseInt(updates.categoryId) : null;
+    if (updates.imageUrl !== undefined) updateData.imageUrl = updates.imageUrl || null;
+    if (updates.isAvailable !== undefined) updateData.isAvailable = updates.isAvailable;
+    if (updates.isFeatured !== undefined) updateData.isFeatured = updates.isFeatured;
+    if (updates.order !== undefined) updateData.order = parseInt(updates.order) || 0;
+
     const [updated] = await db.update(menuItems)
-      .set({
-        ...updates,
-        price: updates.price ? parseFloat(updates.price) : undefined,
-        categoryId: updates.categoryId ? parseInt(updates.categoryId) : undefined,
-        updatedAt: new Date(),
-      })
-      .where(eq(menuItems.id, id))
+      .set(updateData)
+      .where(eq(menuItems.id, parseInt(id)))
       .returning();
 
     if (!updated) {
@@ -120,7 +129,7 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
   } catch (error: any) {
     if (error.status === 401) return error;
     console.error('Error updating menu item:', error);
-    return errorResponse('Error al actualizar item', 500);
+    return errorResponse('Error al actualizar item: ' + (error.message || 'Error desconocido'), 500);
   }
 };
 

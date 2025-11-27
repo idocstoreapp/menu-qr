@@ -107,7 +107,7 @@ export async function initDatabase() {
   // Crear categorías por defecto
   const defaultCategories = [
     { name: 'Entradas', slug: 'entradas', order: 1 },
-    { name: 'Platillos', slug: 'platillos', order: 2 },
+    { name: 'Desayunos', slug: 'desayunos', order: 2 },
     { name: 'Shawarma', slug: 'shawarma', order: 3 },
     { name: 'Menú del Día', slug: 'menu-del-dia', order: 4 },
     { name: 'Menús Combinados', slug: 'menus-combinados', order: 5 },

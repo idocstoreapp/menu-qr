@@ -35,22 +35,35 @@ export default function AdminMenuManager() {
   const handleSave = async (item: any) => {
     try {
       const method = item.id ? 'PUT' : 'POST';
+      
+      // Asegurar que el ID sea un número si existe
+      const payload = {
+        ...item,
+        id: item.id ? parseInt(item.id) : undefined,
+        categoryId: item.categoryId ? parseInt(item.categoryId) : (item.categoryId === '' ? null : undefined),
+        price: parseFloat(item.price) || 0,
+        order: parseInt(item.order) || 0,
+      };
+
       const response = await fetch('/api/menu-items', {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
         setView('list');
         setEditingItem(null);
+        // Recargar la página para actualizar la lista
+        window.location.reload();
       } else {
         const error = await response.json();
-        alert('Error: ' + (error.error || 'No se pudo guardar'));
+        console.error('Error response:', error);
+        alert('Error al actualizar item: ' + (error.error || 'No se pudo guardar. Revisa la consola para más detalles.'));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving item:', error);
-      alert('Error al guardar el item');
+      alert('Error al guardar el item: ' + (error.message || 'Error desconocido'));
     }
   };
 
