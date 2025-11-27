@@ -6,41 +6,46 @@ import { categories, menuItems } from '../db/schema';
 import { eq, asc } from 'drizzle-orm';
 import { seedData } from '../scripts/seed-data';
 
-await initDatabase();
+// Inicializar base de datos de forma segura
+let dbInitialized = false;
+try {
+  await initDatabase();
+  dbInitialized = true;
+} catch (error: any) {
+  console.error('Error inicializando base de datos:', error.message || error);
+  // Continuar aunque falle la inicialización
+}
 
 // Verificar si hay items en la base de datos, si no, cargar datos
 let itemCount = [];
-try {
-  itemCount = await db.select().from(menuItems).limit(1);
-} catch (error) {
-  console.error('Error verificando items:', error);
-}
+let activeCategories = [];
 
-if (itemCount.length === 0) {
-  console.log('📦 Base de datos vacía, cargando datos iniciales...');
+if (dbInitialized) {
   try {
-    await seedData();
-    console.log('✅ Datos cargados correctamente');
-    // Recargar categorías después de cargar datos
+    itemCount = await db.select().from(menuItems).limit(1);
+  } catch (error) {
+    console.error('Error verificando items:', error);
+  }
+
+  if (itemCount.length === 0) {
+    console.log('📦 Base de datos vacía, cargando datos iniciales...');
+    try {
+      await seedData();
+      console.log('✅ Datos cargados correctamente');
+    } catch (error: any) {
+      console.error('❌ Error cargando datos:', error.message || error);
+    }
+  }
+
+  // Obtener categorías activas
+  try {
     activeCategories = await db.select().from(categories)
       .where(eq(categories.isActive, true))
       .orderBy(asc(categories.order), asc(categories.name));
-  } catch (error: any) {
-    console.error('❌ Error cargando datos:', error.message || error);
+  } catch (error) {
+    console.error('Error loading categories:', error);
+    activeCategories = [];
   }
-} else {
-  console.log(`✅ Base de datos tiene ${itemCount.length > 0 ? 'items' : '0 items'}`);
-}
-
-// Obtener categorías activas
-let activeCategories = [];
-try {
-  activeCategories = await db.select().from(categories)
-    .where(eq(categories.isActive, true))
-    .orderBy(asc(categories.order), asc(categories.name));
-} catch (error) {
-  console.error('Error loading categories:', error);
-  activeCategories = [];
 }
 ---
 

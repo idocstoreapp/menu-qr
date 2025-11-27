@@ -10,8 +10,12 @@ const isProduction = import.meta.env.PROD;
 const databaseUrl = import.meta.env.DATABASE_URL || 
   (isProduction ? 'file:/tmp/database.sqlite' : 'file:./database.sqlite');
 
+// Token de autenticación para Turso (opcional, puede venir en la URL)
+const authToken = import.meta.env.TURSO_AUTH_TOKEN;
+
 const client = createClient({
   url: databaseUrl,
+  ...(authToken && { authToken }),
 });
 
 export const db = drizzle(client, { schema });
