@@ -79,41 +79,56 @@ export const GET: APIRoute = async ({ url }) => {
     // Cargar precios editados
     const priceOverrides = await loadPriceOverrides();
 
-    // Filtrar items estáticos
-    let items = staticMenuItems.filter(item => {
-      if (availableOnly && !item.isAvailable) return false;
-      if (categoryId && item.categoryId !== parseInt(categoryId)) return false;
-      return true;
-    });
+    // Obtener todas las categorías y crear mapa slug -> id
+    let categoriesMap = new Map<string, any>();
+    let categorySlugToId = new Map<string, number>();
+    
+    try {
+      const allCats = await db.select({
+        id: categories.id,
+        name: categories.name,
+        slug: categories.slug,
+      })
+      .from(categories)
+      .where(eq(categories.isActive, true))
+      .orderBy(asc(categories.order), asc(categories.name));
+
+      for (const cat of allCats) {
+        categoriesMap.set(cat.id.toString(), cat);
+        categorySlugToId.set(cat.slug, cat.id);
+      }
+    } catch (error) {
+      console.warn('⚠️ Error obteniendo categorías, continuando sin ellas:', error);
+    }
+
+    // Filtrar items estáticos y mapear slugs a IDs
+    let items = staticMenuItems
+      .filter(item => {
+        if (availableOnly && !item.isAvailable) return false;
+        
+        // Si se especifica categoryId, mapear el slug del item a su ID y comparar
+        if (categoryId) {
+          const itemCategoryId = categorySlugToId.get(item.categorySlug);
+          if (!itemCategoryId || itemCategoryId !== parseInt(categoryId)) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map(item => {
+        // Mapear categorySlug a categoryId
+        const categoryId = categorySlugToId.get(item.categorySlug);
+        return {
+          ...item,
+          categoryId: categoryId || null,
+        };
+      });
 
     // Aplicar precios editados
     items = items.map(item => ({
       ...item,
       price: priceOverrides[item.id] !== undefined ? priceOverrides[item.id] : item.price,
     }));
-
-    // Obtener categorías de la base de datos
-    const categoryIds = Array.from(new Set(items.map(item => item.categoryId)));
-    let categoriesMap = new Map<number, any>();
-
-    try {
-      if (categoryIds.length > 0) {
-        const allCats = await db.select({
-          id: categories.id,
-          name: categories.name,
-          slug: categories.slug,
-        })
-        .from(categories)
-        .where(inArray(categories.id, categoryIds))
-        .orderBy(asc(categories.order), asc(categories.name));
-
-        for (const cat of allCats) {
-          categoriesMap.set(cat.id, cat);
-        }
-      }
-    } catch (error) {
-      console.warn('⚠️ Error obteniendo categorías, continuando sin ellas:', error);
-    }
 
     // Agregar información de categoría a cada item
     const itemsWithCategories = items
@@ -132,8 +147,8 @@ export const GET: APIRoute = async ({ url }) => {
         isAvailable: item.isAvailable ?? true,
         isFeatured: item.isFeatured ?? false,
         order: item.order,
-        category: categoriesMap.has(item.categoryId)
-          ? categoriesMap.get(item.categoryId)
+        category: item.categoryId && categoriesMap.has(item.categoryId.toString())
+          ? categoriesMap.get(item.categoryId.toString())
           : null,
       }));
 
