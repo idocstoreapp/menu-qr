@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ url }) => {
     // Intentar consulta con Drizzle primero
     try {
       // Obtener items sin join para evitar duplicados
-      let baseQuery = db.select({
+      const baseQuery = db.select({
         id: menuItems.id,
         name: menuItems.name,
         description: menuItems.description,
@@ -44,15 +44,14 @@ export const GET: APIRoute = async ({ url }) => {
       })
       .from(menuItems);
 
-      if (conditions.length > 0) {
-        if (conditions.length === 1) {
-          baseQuery = baseQuery.where(conditions[0]);
-        } else {
-          baseQuery = baseQuery.where(and(...conditions));
-        }
-      }
+      // Construir la consulta con condiciones
+      const queryWithConditions = conditions.length > 0
+        ? (conditions.length === 1
+            ? baseQuery.where(conditions[0])
+            : baseQuery.where(and(...conditions)))
+        : baseQuery;
 
-      const items = await baseQuery.orderBy(asc(menuItems.order), asc(menuItems.name));
+      const items = await queryWithConditions.orderBy(asc(menuItems.order), asc(menuItems.name));
       
       // Eliminar duplicados por ID usando Map (más robusto)
       const itemsMap = new Map<number, any>();
@@ -124,9 +123,16 @@ export const GET: APIRoute = async ({ url }) => {
         console.log('⚠️ Columna video_url no existe, usando consulta SQL directa...');
         
         const { createClient } = await import('@libsql/client');
+        // Acceder a variables de entorno - Astro usa import.meta.env
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error - import.meta.env es válido en Astro runtime
         const isProduction = import.meta.env.PROD;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error - import.meta.env es válido en Astro runtime
         const databaseUrl = import.meta.env.DATABASE_URL || 
           (isProduction ? 'file:/tmp/database.sqlite' : 'file:./database.sqlite');
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error - import.meta.env es válido en Astro runtime
         const authToken = import.meta.env.TURSO_AUTH_TOKEN;
         
         const client = createClient({
