@@ -3,7 +3,7 @@ import PublicLayout from '../layouts/PublicLayout.astro';
 import { initDatabase } from '../db/index';
 import { db } from '../db/index';
 import { categories, menuItems } from '../db/schema';
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, inArray } from 'drizzle-orm';
 import { seedData } from '../scripts/seed-data';
 
 // Inicializar base de datos de forma segura
@@ -42,11 +42,28 @@ if (dbInitialized) {
     console.log('⚠️ Base de datos vacía en producción. Usa /api/seed para cargar datos manualmente.');
   }
 
-  // Obtener categorías activas
+  // Obtener solo categorías que tienen items disponibles
   try {
-    activeCategories = await db.select().from(categories)
-      .where(eq(categories.isActive, true))
-      .orderBy(asc(categories.order), asc(categories.name));
+    // Obtener IDs de categorías que tienen items disponibles
+    const categoriesWithItems = await db
+      .selectDistinct({ categoryId: menuItems.categoryId })
+      .from(menuItems)
+      .where(eq(menuItems.isAvailable, true));
+    
+    const categoryIds = categoriesWithItems
+      .map(c => c.categoryId)
+      .filter(id => id !== null) as number[];
+    
+    if (categoryIds.length > 0) {
+      // Usar consulta con IN para obtener solo categorías con items
+      const { inArray } = await import('drizzle-orm');
+      activeCategories = await db.select().from(categories)
+        .where(eq(categories.isActive, true))
+        .where(inArray(categories.id, categoryIds))
+        .orderBy(asc(categories.order), asc(categories.name));
+    } else {
+      activeCategories = [];
+    }
   } catch (error) {
     console.error('Error loading categories:', error);
     activeCategories = [];

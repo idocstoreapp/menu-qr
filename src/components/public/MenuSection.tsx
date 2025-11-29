@@ -60,7 +60,16 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
       }
       const data = await response.json();
       console.log(`Items cargados para ${category.name}:`, data.length);
-      setItems(Array.isArray(data) ? data : []);
+      
+      // Eliminar duplicados basándose en el ID
+      const uniqueItems = Array.isArray(data) 
+        ? Array.from(
+            new Map(data.map((item: MenuItem) => [item.id, item])).values()
+          )
+        : [];
+      
+      console.log(`Items únicos después de deduplicación: ${uniqueItems.length}`);
+      setItems(uniqueItems);
     } catch (error) {
       console.error('Error fetching items:', error);
       setItems([]);

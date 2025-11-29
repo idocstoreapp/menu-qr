@@ -4,19 +4,35 @@ import MenuSection from '../components/public/MenuSection';
 import ComboMenusSection from '../components/public/ComboMenusSection';
 import { initDatabase } from '../db/index';
 import { db } from '../db/index';
-import { categories } from '../db/schema';
-import { eq, asc } from 'drizzle-orm';
+import { categories, menuItems } from '../db/schema';
+import { eq, asc, inArray } from 'drizzle-orm';
 
 await initDatabase();
 
-// Obtener todas las categorías para la navegación
+// Obtener solo categorías que tienen items disponibles para la navegación
 let allCategories = [];
 try {
-  allCategories = await db.select().from(categories)
-    .where(eq(categories.isActive, true))
-    .orderBy(asc(categories.order), asc(categories.name));
+  // Obtener IDs de categorías que tienen items disponibles
+  const categoriesWithItems = await db
+    .selectDistinct({ categoryId: menuItems.categoryId })
+    .from(menuItems)
+    .where(eq(menuItems.isAvailable, true));
+  
+  const categoryIds = categoriesWithItems
+    .map(c => c.categoryId)
+    .filter(id => id !== null) as number[];
+  
+  if (categoryIds.length > 0) {
+    allCategories = await db.select().from(categories)
+      .where(eq(categories.isActive, true))
+      .where(inArray(categories.id, categoryIds))
+      .orderBy(asc(categories.order), asc(categories.name));
+  } else {
+    allCategories = [];
+  }
 } catch (error) {
   console.error('Error loading categories:', error);
+  allCategories = [];
 }
 
 // Obtener la categoría actual desde el parámetro

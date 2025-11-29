@@ -98,11 +98,11 @@ export default function AdminMenuManager() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-2xl font-cinzel text-gold-400">Items del Menú</h2>
+      <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <h2 className="text-xl md:text-2xl font-cinzel text-gold-400">Items del Menú</h2>
         <button
           onClick={handleAddNew}
-          className="bg-gold-600 hover:bg-gold-500 text-arabic-dark font-bold py-2 px-4 rounded transition"
+          className="bg-gold-600 hover:bg-gold-500 text-arabic-dark font-bold py-2 px-4 rounded transition whitespace-nowrap"
         >
           + Agregar Item
         </button>

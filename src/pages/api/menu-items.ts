@@ -59,8 +59,13 @@ export const GET: APIRoute = async ({ url }) => {
 
       const items = await query.orderBy(asc(menuItems.order), asc(menuItems.name));
       
-      console.log(`API: Devolviendo ${items.length} items para categoría ${categoryId || 'todas'}`);
-      return jsonResponse(items);
+      // Eliminar duplicados basándose en el ID
+      const uniqueItems = Array.from(
+        new Map(items.map((item: any) => [item.id, item])).values()
+      );
+      
+      console.log(`API: Devolviendo ${uniqueItems.length} items únicos (de ${items.length} totales) para categoría ${categoryId || 'todas'}`);
+      return jsonResponse(uniqueItems);
     } catch (drizzleError: any) {
       // Si falla por columna video_url, usar SQL directo sin esa columna
       if (drizzleError.message?.includes('video_url') || drizzleError.message?.includes('no such column')) {
@@ -126,8 +131,13 @@ export const GET: APIRoute = async ({ url }) => {
           } : null,
         }));
         
-        console.log(`API: Devolviendo ${items.length} items para categoría ${categoryId || 'todas'} (SQL directo)`);
-        return jsonResponse(items);
+        // Eliminar duplicados basándose en el ID
+        const uniqueItems = Array.from(
+          new Map(items.map((item: any) => [item.id, item])).values()
+        );
+        
+        console.log(`API: Devolviendo ${uniqueItems.length} items únicos (de ${items.length} totales) para categoría ${categoryId || 'todas'} (SQL directo)`);
+        return jsonResponse(uniqueItems);
       } else {
         throw drizzleError;
       }
@@ -153,6 +163,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     if (!name || !price) {
       return errorResponse('Nombre y precio son requeridos', 400);
+    }
+
+    if (!categoryId) {
+      return errorResponse('La categoría (sección) es requerida', 400);
     }
 
     const [newItem] = await db.insert(menuItems).values({
@@ -197,7 +211,12 @@ export const PUT: APIRoute = async ({ request, cookies }) => {
     if (updates.name !== undefined) updateData.name = updates.name;
     if (updates.description !== undefined) updateData.description = updates.description || null;
     if (updates.price !== undefined) updateData.price = parseFloat(updates.price);
-    if (updates.categoryId !== undefined) updateData.categoryId = updates.categoryId ? parseInt(updates.categoryId) : null;
+    if (updates.categoryId !== undefined) {
+      if (!updates.categoryId) {
+        return errorResponse('La categoría (sección) es requerida', 400);
+      }
+      updateData.categoryId = parseInt(updates.categoryId);
+    }
     if (updates.imageUrl !== undefined) updateData.imageUrl = updates.imageUrl || null;
     if (updates.videoUrl !== undefined) updateData.videoUrl = updates.videoUrl || null;
     if (updates.isAvailable !== undefined) updateData.isAvailable = updates.isAvailable;

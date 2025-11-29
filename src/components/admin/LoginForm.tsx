@@ -78,11 +78,6 @@ export default function LoginForm() {
             {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
-
-        <p className="text-beige text-sm text-center mt-6">
-          Usuario por defecto: <span className="text-gold-400">admin</span> / 
-          Contraseña: <span className="text-gold-400">admin123</span>
-        </p>
       </div>
     </div>
   );

@@ -83,19 +83,21 @@ export default function MenuItemForm({ item, categories, onSave, onCancel }: Men
         </div>
 
         <div>
-          <label className="block text-gold-400 mb-2">Categoría</label>
+          <label className="block text-gold-400 mb-2">Categoría (Sección) *</label>
           <select
             value={formData.categoryId || ''}
             onChange={(e) => setFormData({ ...formData, categoryId: e.target.value ? parseInt(e.target.value) : undefined })}
             className="w-full px-4 py-2 bg-arabic-brown text-cream rounded border border-gold-600 focus:border-gold-400 focus:outline-none"
+            required
           >
-            <option value="">Sin categoría</option>
+            <option value="">Selecciona una sección</option>
             {categories.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.name}
               </option>
             ))}
           </select>
+          <p className="text-gold-300 text-xs mt-1">Selecciona en qué sección aparecerá este item</p>
         </div>
       </div>
 

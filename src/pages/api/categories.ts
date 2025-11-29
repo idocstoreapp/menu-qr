@@ -1,16 +1,44 @@
 import type { APIRoute } from 'astro';
 import { db } from '../../db/index';
-import { categories } from '../../db/schema';
-import { eq, asc } from 'drizzle-orm';
+import { categories, menuItems } from '../../db/schema';
+import { eq, asc, inArray } from 'drizzle-orm';
 import { requireAuth, jsonResponse, errorResponse } from '../../lib/api-helpers';
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ url }) => {
   try {
-    const cats = await db.select().from(categories)
-      .where(eq(categories.isActive, true))
-      .orderBy(asc(categories.order), asc(categories.name));
+    const onlyWithItems = url.searchParams.get('onlyWithItems') === 'true';
+    
+    if (onlyWithItems) {
+      // Devolver solo categorías que tienen items disponibles
+      // Primero obtener los IDs de categorías con items disponibles
+      const itemsWithCategories = await db
+        .selectDistinct({ categoryId: menuItems.categoryId })
+        .from(menuItems)
+        .where(eq(menuItems.isAvailable, true));
+      
+      const categoryIds = itemsWithCategories
+        .map(item => item.categoryId)
+        .filter(id => id !== null) as number[];
+      
+      if (categoryIds.length === 0) {
+        return jsonResponse([]);
+      }
+      
+      // Luego obtener las categorías
+      const catsWithItems = await db.select().from(categories)
+        .where(eq(categories.isActive, true))
+        .where(inArray(categories.id, categoryIds))
+        .orderBy(asc(categories.order), asc(categories.name));
 
-    return jsonResponse(cats);
+      return jsonResponse(catsWithItems);
+    } else {
+      // Devolver todas las categorías activas (para el panel admin)
+      const cats = await db.select().from(categories)
+        .where(eq(categories.isActive, true))
+        .orderBy(asc(categories.order), asc(categories.name));
+
+      return jsonResponse(cats);
+    }
   } catch (error) {
     console.error('Error fetching categories:', error);
     return errorResponse('Error al obtener categorías', 500);
