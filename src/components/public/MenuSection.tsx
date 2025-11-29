@@ -33,10 +33,11 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   const isFetchingRef = useRef(false);
   const lastCategoryIdRef = useRef<number | null>(null);
   const renderCountRef = useRef(0);
+  const instanceIdRef = useRef(Math.random().toString(36).substring(7));
   
   // Log cada vez que el componente se renderiza
   renderCountRef.current += 1;
-  console.log(`[MenuSection] Render #${renderCountRef.current} - Items en estado: ${items.length}`);
+  console.log(`[MenuSection-${instanceIdRef.current}] Render #${renderCountRef.current} - Items en estado: ${items.length}`);
 
   useEffect(() => {
     // Si category es string (JSON), parsearlo
@@ -60,13 +61,13 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
 
   const fetchItems = async () => {
     if (!category || isFetchingRef.current) {
-      console.log(`[MenuSection] Saltando fetch - category: ${category?.id}, isFetching: ${isFetchingRef.current}`);
+      console.log(`[MenuSection-${instanceIdRef.current}] Saltando fetch - category: ${category?.id}, isFetching: ${isFetchingRef.current}`);
       return;
     }
     
     isFetchingRef.current = true;
     setLoading(true);
-    console.log(`[MenuSection] Iniciando fetch para categoría ${category.id} (${category.name})`);
+    console.log(`[MenuSection-${instanceIdRef.current}] Iniciando fetch para categoría ${category.id} (${category.name})`);
     
     try {
       const response = await fetch(`/api/menu-items?categoryId=${category.id}&availableOnly=true`);
@@ -74,7 +75,7 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log(`[MenuSection] Items recibidos del API para ${category.name}:`, data.length);
+      console.log(`[MenuSection-${instanceIdRef.current}] Items recibidos del API para ${category.name}:`, data.length);
       
       // Eliminar duplicados basándose en el ID (más robusto)
       if (!Array.isArray(data)) {
@@ -97,18 +98,18 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
       const uniqueItems = Object.values(itemsById);
       
       if (data.length !== uniqueItems.length) {
-        console.warn(`⚠️ [MenuSection] Se encontraron ${data.length - uniqueItems.length} items duplicados en ${category.name}, eliminados.`);
+        console.warn(`⚠️ [MenuSection-${instanceIdRef.current}] Se encontraron ${data.length - uniqueItems.length} items duplicados en ${category.name}, eliminados.`);
       }
       
-      console.log(`[MenuSection] Items únicos después de deduplicación: ${uniqueItems.length} (de ${data.length} recibidos)`);
+      console.log(`[MenuSection-${instanceIdRef.current}] Items únicos después de deduplicación: ${uniqueItems.length} (de ${data.length} recibidos)`);
       setItems(uniqueItems);
     } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error(`[MenuSection-${instanceIdRef.current}] Error fetching items:`, error);
       setItems([]);
     } finally {
       setLoading(false);
       isFetchingRef.current = false;
-      console.log(`[MenuSection] Fetch completado para categoría ${category.id}`);
+      console.log(`[MenuSection-${instanceIdRef.current}] Fetch completado para categoría ${category.id}`);
     }
   };
 
@@ -125,7 +126,11 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   }
 
   return (
-    <section id={category.slug} className="mb-16 scroll-mt-20">
+    <section 
+      id={category.slug} 
+      className="mb-16 scroll-mt-20"
+      data-menu-section-instance={instanceIdRef.current}
+    >
       <div className="text-center mb-8">
         <h2 className="text-4xl font-cinzel text-gold-400 mb-4 relative inline-block px-8 py-4 bg-black/80 backdrop-blur-md rounded-lg border-2 border-gold-600" style={{textShadow: '0 0 10px rgba(212, 175, 55, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.8)'}}>
           <span className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 text-2xl text-gold-400 opacity-90">✦</span>
@@ -157,10 +162,16 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
             const itemIds = items.map(item => item.id);
             const uniqueIds = new Set(itemIds);
             if (itemIds.length !== uniqueIds.size) {
-              console.error(`🚨 [MenuSection] ERROR: Se detectaron ${itemIds.length - uniqueIds.size} IDs duplicados en el array de items al renderizar!`);
+              console.error(`🚨 [MenuSection-${instanceIdRef.current}] ERROR: Se detectaron ${itemIds.length - uniqueIds.size} IDs duplicados en el array de items al renderizar!`);
               console.log('IDs duplicados:', itemIds.filter((id, index) => itemIds.indexOf(id) !== index));
             }
-            console.log(`[MenuSection] Renderizando ${items.length} items con IDs:`, itemIds);
+            console.log(`[MenuSection-${instanceIdRef.current}] Renderizando ${items.length} items con IDs:`, itemIds);
+            
+            // Verificar cuántos elementos hay en el DOM
+            const domElements = document.querySelectorAll(`[data-menu-section-instance="${instanceIdRef.current}"] .grid > *`);
+            if (domElements.length > items.length) {
+              console.error(`🚨 [MenuSection-${instanceIdRef.current}] ERROR: Hay ${domElements.length} elementos en el DOM pero solo ${items.length} items en el estado!`);
+            }
             
             // Asegurar que solo renderizamos items únicos
             const seenIds = new Set<number>();
