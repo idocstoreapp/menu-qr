@@ -50,18 +50,6 @@ export default function MenuItemList({ onEdit, onDelete }: MenuItemListProps) {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de eliminar este item?')) return;
-
-    try {
-      const response = await fetch(`/api/menu-items?id=${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        fetchItems();
-      }
-    } catch (error) {
-      console.error('Error deleting item:', error);
-    }
-  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CL', {
@@ -107,13 +95,7 @@ export default function MenuItemList({ onEdit, onDelete }: MenuItemListProps) {
                 onClick={() => onEdit(item)}
                 className="bg-gold-600 hover:bg-gold-500 text-arabic-dark px-4 py-2 rounded transition whitespace-nowrap"
               >
-                Editar
-              </button>
-              <button
-                onClick={() => handleDelete(item.id)}
-                className="bg-red-600 hover:bg-red-500 text-cream px-4 py-2 rounded transition whitespace-nowrap"
-              >
-                Eliminar
+                Editar Precio
               </button>
             </div>
           </div>

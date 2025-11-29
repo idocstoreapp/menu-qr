@@ -1,57 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import MenuItemList from './MenuItemList';
 import MenuItemForm from './MenuItemForm';
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
 
 export default function AdminMenuManager() {
   const [view, setView] = useState<'list' | 'form'>('list');
   const [editingItem, setEditingItem] = useState<any>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    try {
-      const response = await fetch('/api/categories');
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error('Error loading categories:', error);
-    }
-  };
 
   const handleEdit = (item: any) => {
     setEditingItem(item);
     setView('form');
   };
 
-  const handleSave = async (item: any) => {
+  const handleSave = async (id: number, price: number) => {
     try {
-      const method = item.id ? 'PUT' : 'POST';
-      
-      // Asegurar que el ID sea un número si existe
-      const payload = {
-        ...item,
-        id: item.id ? parseInt(item.id) : undefined,
-        categoryId: item.categoryId ? parseInt(item.categoryId) : (item.categoryId === '' ? null : undefined),
-        price: parseFloat(item.price) || 0,
-        order: parseInt(item.order) || 0,
-      };
-
       const response = await fetch('/api/menu-items', {
-        method,
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ id, price }),
       });
 
       if (response.ok) {
+        const result = await response.json();
+        alert('✅ Precio actualizado correctamente');
         setView('list');
         setEditingItem(null);
         // Recargar la página para actualizar la lista
@@ -59,22 +29,17 @@ export default function AdminMenuManager() {
       } else {
         const error = await response.json();
         console.error('Error response:', error);
-        alert('Error al actualizar item: ' + (error.error || 'No se pudo guardar. Revisa la consola para más detalles.'));
+        alert('❌ Error al actualizar precio: ' + (error.error || 'No se pudo guardar.'));
       }
     } catch (error: any) {
-      console.error('Error saving item:', error);
-      alert('Error al guardar el item: ' + (error.message || 'Error desconocido'));
+      console.error('Error saving price:', error);
+      alert('❌ Error al guardar el precio: ' + (error.message || 'Error desconocido'));
     }
   };
 
   const handleCancel = () => {
     setView('list');
     setEditingItem(null);
-  };
-
-  const handleAddNew = () => {
-    setEditingItem(null);
-    setView('form');
   };
 
   if (view === 'form') {
@@ -88,7 +53,6 @@ export default function AdminMenuManager() {
         </button>
         <MenuItemForm
           item={editingItem}
-          categories={categories}
           onSave={handleSave}
           onCancel={handleCancel}
         />
@@ -98,25 +62,18 @@ export default function AdminMenuManager() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <h2 className="text-xl md:text-2xl font-cinzel text-gold-400">Items del Menú</h2>
-        <button
-          onClick={handleAddNew}
-          className="bg-gold-600 hover:bg-gold-500 text-arabic-dark font-bold py-2 px-4 rounded transition whitespace-nowrap"
-        >
-          + Agregar Item
-        </button>
+      <div className="mb-6">
+        <h2 className="text-xl md:text-2xl font-cinzel text-gold-400 mb-2">Items del Menú</h2>
+        <p className="text-gold-300 text-sm">
+          ⚠️ Los items del menú son estáticos. Solo puedes editar los precios haciendo clic en "Editar".
+        </p>
       </div>
-      <MenuItemList onEdit={handleEdit} onDelete={async (id) => {
-        if (confirm('¿Estás seguro de eliminar este item?')) {
-          const response = await fetch(`/api/menu-items?id=${id}`, { method: 'DELETE' });
-          if (response.ok) {
-            window.location.reload();
-          }
-        }
-      }} />
+      <MenuItemList 
+        onEdit={handleEdit} 
+        onDelete={async () => {
+          alert('⚠️ No se pueden eliminar items. Los items del menú son estáticos.');
+        }} 
+      />
     </div>
   );
 }
-
-
