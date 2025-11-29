@@ -76,8 +76,8 @@ const currentCategory = allCategories.find(cat => cat.slug === categorySlug) || 
       currentCategory.slug === 'menus-combinados' ? (
         <ComboMenusSection client:load />
       ) : (
-        <div>
-          <MenuSection category={JSON.stringify(currentCategory)} client:load />
+        <div id={`menu-section-${currentCategory.slug}`}>
+          <MenuSection category={JSON.stringify(currentCategory)} client:only="react" />
         </div>
       )
     ) : (

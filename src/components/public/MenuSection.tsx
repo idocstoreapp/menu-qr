@@ -32,6 +32,7 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   const [category, setCategory] = useState<Category | null>(null);
   const fetchInProgress = useRef(false);
   const mountedRef = useRef(true);
+  const componentId = useRef(`menu-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
   // Parsear categoría
   useEffect(() => {
@@ -105,14 +106,51 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   // Memoizar items únicos para evitar re-renders innecesarios
   const uniqueItems = useMemo(() => {
     const seen = new Set<number>();
-    return items.filter(item => {
-      if (seen.has(item.id)) {
-        return false;
+    const result: MenuItem[] = [];
+    for (const item of items) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        result.push(item);
       }
-      seen.add(item.id);
-      return true;
-    });
+    }
+    return result;
   }, [items]);
+
+  // Limpiar duplicados en el DOM después del render
+  useEffect(() => {
+    if (uniqueItems.length === 0) return;
+
+    const cleanupDuplicates = () => {
+      const grid = document.querySelector(`[data-component-id="${componentId.current}"] .grid`);
+      if (!grid) return;
+
+      const cards = Array.from(grid.children);
+      const seenIds = new Set<string>();
+      let removed = 0;
+
+      cards.forEach((card, index) => {
+        const key = card.getAttribute('data-item-key') || `${componentId.current}-${index}`;
+        const itemId = card.getAttribute('data-item-id');
+        
+        if (itemId && seenIds.has(itemId)) {
+          card.remove();
+          removed++;
+        } else if (itemId) {
+          seenIds.add(itemId);
+          card.setAttribute('data-item-key', key);
+          card.setAttribute('data-item-id', itemId);
+        }
+      });
+
+      if (removed > 0) {
+        console.warn(`⚠️ [MenuSection] Se eliminaron ${removed} elementos duplicados del DOM`);
+      }
+    };
+
+    // Ejecutar después de que React haya renderizado
+    const timeoutId = setTimeout(cleanupDuplicates, 50);
+    return () => clearTimeout(timeoutId);
+  }, [uniqueItems, componentId]);
 
   if (!category) {
     return null;
@@ -129,7 +167,11 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   }
 
   return (
-    <section id={category.slug} className="mb-16 scroll-mt-20">
+    <section 
+      id={category.slug} 
+      className="mb-16 scroll-mt-20"
+      data-component-id={componentId.current}
+    >
       <div className="text-center mb-8">
         <h2 className="text-4xl font-cinzel text-gold-400 mb-4 relative inline-block px-8 py-4 bg-black/80 backdrop-blur-md rounded-lg border-2 border-gold-600" style={{textShadow: '0 0 10px rgba(212, 175, 55, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.8)'}}>
           <span className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 text-2xl text-gold-400 opacity-90">✦</span>
@@ -145,9 +187,15 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
           <p className="text-gold-400 text-sm">Categoría ID: {category.id} | Slug: {category.slug}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {uniqueItems.map((item) => (
-            <MenuItemCard key={`item-${item.id}`} item={item} />
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          data-items-count={uniqueItems.length}
+        >
+          {uniqueItems.map((item, index) => (
+            <MenuItemCard 
+              key={`${componentId.current}-${item.id}-${index}`} 
+              item={item} 
+            />
           ))}
         </div>
       )}
