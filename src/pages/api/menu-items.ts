@@ -54,14 +54,25 @@ export const GET: APIRoute = async ({ url }) => {
 
       const items = await baseQuery.orderBy(asc(menuItems.order), asc(menuItems.name));
       
-      // Eliminar duplicados por ID usando Map
+      // Eliminar duplicados por ID usando Map (más robusto)
       const itemsMap = new Map<number, any>();
+      const seenIds = new Set<number>();
+      
       for (const item of items) {
-        if (!itemsMap.has(item.id)) {
-          itemsMap.set(item.id, item);
+        const id = Number(item.id);
+        // Solo agregar si el ID es válido y no lo hemos visto antes
+        if (id && id > 0 && !seenIds.has(id)) {
+          seenIds.add(id);
+          itemsMap.set(id, item);
         }
       }
+      
       const uniqueItems = Array.from(itemsMap.values());
+      
+      // Log para debugging
+      if (items.length !== uniqueItems.length) {
+        console.log(`⚠️ Se encontraron ${items.length - uniqueItems.length} items duplicados, eliminados.`);
+      }
       
       // Obtener todas las categorías necesarias de una vez
       const categoryIds = uniqueItems
@@ -142,57 +153,75 @@ export const GET: APIRoute = async ({ url }) => {
         
         const result = await client.execute({ sql, args });
         
-        // Crear un Map para eliminar duplicados por ID
-        const itemsMap = new Map();
+        // Crear un Map para eliminar duplicados por ID (más robusto)
+        const itemsMap = new Map<number, any>();
+        const seenIds = new Set<number>();
+        
         for (const row of result.rows) {
-          const id = Number(row.id);
-          if (!itemsMap.has(id)) {
+          // Acceder a los campos usando el alias o el nombre de columna original
+          const id = Number(row.id || (row as any).id);
+          const categoryId = Number(row.categoryId || (row as any).category_id || 0);
+          // Manejar campos booleanos de forma más robusta
+          const isAvailableRaw = row.isAvailable !== undefined ? row.isAvailable : (row as any).is_available;
+          const isAvailable = isAvailableRaw === 1 || isAvailableRaw === true || String(isAvailableRaw) === '1';
+          
+          const isFeaturedRaw = row.isFeatured !== undefined ? row.isFeatured : (row as any).is_featured;
+          const isFeatured = isFeaturedRaw === 1 || isFeaturedRaw === true || String(isFeaturedRaw) === '1';
+          
+          // Solo agregar si no hemos visto este ID antes
+          if (id && !seenIds.has(id)) {
+            seenIds.add(id);
             itemsMap.set(id, {
               id: id,
-              name: String(row.name || ''),
-              description: row.description ? String(row.description) : null,
-              price: Number(row.price || 0),
-              categoryId: row.categoryId ? Number(row.categoryId) : null,
-              imageUrl: row.imageUrl ? String(row.imageUrl) : null,
+              name: String(row.name || (row as any).name || ''),
+              description: (row.description || (row as any).description) ? String(row.description || (row as any).description) : null,
+              price: Number(row.price || (row as any).price || 0),
+              categoryId: categoryId || null,
+              imageUrl: (row.imageUrl || (row as any).image_url) ? String(row.imageUrl || (row as any).image_url) : null,
               videoUrl: null,
-              isAvailable: row.isAvailable === 1 || row.isAvailable === true,
-              isFeatured: row.isFeatured === 1 || row.isFeatured === true,
-              order: Number(row.order || 0),
+              isAvailable: isAvailable,
+              isFeatured: isFeatured,
+              order: Number(row.order || (row as any).order || 0),
             });
           }
         }
         
         const items = Array.from(itemsMap.values());
         
-        // Obtener categorías para cada item único
-        const itemsWithCategories = await Promise.all(
-          items.map(async (item: any) => {
-            if (item.categoryId) {
-              try {
-                const categoryResult = await client.execute({
-                  sql: `SELECT id, name, slug FROM categories WHERE id = ? LIMIT 1`,
-                  args: [item.categoryId],
-                });
-                
-                if (categoryResult.rows.length > 0) {
-                  const catRow = categoryResult.rows[0];
-                  item.category = {
-                    id: Number(catRow.id),
-                    name: String(catRow.name || ''),
-                    slug: String(catRow.slug || ''),
-                  };
-                } else {
-                  item.category = null;
-                }
-              } catch {
-                item.category = null;
-              }
-            } else {
-              item.category = null;
-            }
-            return item;
-          })
-        );
+        // Obtener todas las categorías necesarias de una vez (más eficiente)
+        const categoryIds = items
+          .map((item: any) => item.categoryId)
+          .filter((id: any): id is number => id !== null && id !== undefined && id > 0);
+        
+        const categoriesMap = new Map<number, any>();
+        if (categoryIds.length > 0) {
+          // Eliminar duplicados de categoryIds
+          const uniqueCategoryIds = Array.from(new Set(categoryIds));
+          
+          // Obtener todas las categorías en una consulta
+          const placeholders = uniqueCategoryIds.map(() => '?').join(',');
+          const categoryResult = await client.execute({
+            sql: `SELECT id, name, slug FROM categories WHERE id IN (${placeholders})`,
+            args: uniqueCategoryIds,
+          });
+          
+          for (const catRow of categoryResult.rows) {
+            const catId = Number(catRow.id || (catRow as any).id);
+            categoriesMap.set(catId, {
+              id: catId,
+              name: String(catRow.name || (catRow as any).name || ''),
+              slug: String(catRow.slug || (catRow as any).slug || ''),
+            });
+          }
+        }
+        
+        // Combinar items con sus categorías
+        const itemsWithCategories = items.map((item: any) => ({
+          ...item,
+          category: item.categoryId && categoriesMap.has(item.categoryId)
+            ? categoriesMap.get(item.categoryId)
+            : null,
+        }));
         
         console.log(`API: Devolviendo ${itemsWithCategories.length} items únicos (de ${result.rows.length} totales) para categoría ${categoryId || 'todas'} (SQL directo)`);
         return jsonResponse(itemsWithCategories);

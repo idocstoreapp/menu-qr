@@ -61,12 +61,30 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
       const data = await response.json();
       console.log(`Items cargados para ${category.name}:`, data.length);
       
-      // Eliminar duplicados basándose en el ID
-      const uniqueItems = Array.isArray(data) 
-        ? Array.from(
-            new Map(data.map((item: MenuItem) => [item.id, item])).values()
-          )
-        : [];
+      // Eliminar duplicados basándose en el ID (más robusto)
+      if (!Array.isArray(data)) {
+        console.warn('⚠️ Los datos recibidos no son un array:', typeof data);
+        setItems([]);
+        return;
+      }
+      
+      const itemsMap = new Map<number, MenuItem>();
+      const seenIds = new Set<number>();
+      
+      for (const item of data) {
+        const id = Number(item?.id);
+        // Solo agregar si el ID es válido y no lo hemos visto antes
+        if (id && id > 0 && !seenIds.has(id)) {
+          seenIds.add(id);
+          itemsMap.set(id, item as MenuItem);
+        }
+      }
+      
+      const uniqueItems = Array.from(itemsMap.values());
+      
+      if (data.length !== uniqueItems.length) {
+        console.warn(`⚠️ Se encontraron ${data.length - uniqueItems.length} items duplicados en ${category.name}, eliminados.`);
+      }
       
       console.log(`Items únicos después de deduplicación: ${uniqueItems.length}`);
       setItems(uniqueItems);
