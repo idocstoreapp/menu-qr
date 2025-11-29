@@ -7,8 +7,8 @@ export async function seedData(forceClean: boolean = false) {
   await initDatabase();
   
   // Verificar si ya hay datos
-  const existingItems = await db.select().from(menuItems).limit(1);
-  const hasData = existingItems.length > 0;
+  const existingItemsCheck = await db.select().from(menuItems).limit(1);
+  const hasData = existingItemsCheck.length > 0;
   
   // Solo limpiar si se fuerza o si no hay datos
   if (forceClean || !hasData) {
