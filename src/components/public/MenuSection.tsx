@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, StrictMode } from 'react';
 import MenuItemCard from './MenuItemCard';
 
 interface MenuItem {
@@ -116,41 +116,73 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
     return result;
   }, [items]);
 
-  // Limpiar duplicados en el DOM después del render
+  // Limpiar duplicados en el DOM después del render (especialmente importante en producción)
   useEffect(() => {
-    if (uniqueItems.length === 0) return;
+    if (uniqueItems.length === 0 || loading) return;
 
     const cleanupDuplicates = () => {
-      const grid = document.querySelector(`[data-component-id="${componentId.current}"] .grid`);
+      const section = document.querySelector(`[data-component-id="${componentId.current}"]`);
+      if (!section) return;
+
+      const grid = section.querySelector('.grid');
       if (!grid) return;
 
       const cards = Array.from(grid.children);
-      const seenIds = new Set<string>();
+      const seenIds = new Set<number>();
+      const cardsToKeep: Element[] = [];
       let removed = 0;
 
-      cards.forEach((card, index) => {
-        const key = card.getAttribute('data-item-key') || `${componentId.current}-${index}`;
-        const itemId = card.getAttribute('data-item-id');
+      // Primera pasada: identificar duplicados
+      cards.forEach((card) => {
+        const itemIdAttr = card.getAttribute('data-item-id');
+        if (!itemIdAttr) return;
         
-        if (itemId && seenIds.has(itemId)) {
+        const itemId = Number(itemIdAttr);
+        if (!itemId || itemId <= 0) return;
+
+        if (seenIds.has(itemId)) {
+          // Duplicado encontrado, marcar para eliminar
           card.remove();
           removed++;
-        } else if (itemId) {
+        } else {
           seenIds.add(itemId);
-          card.setAttribute('data-item-key', key);
-          card.setAttribute('data-item-id', itemId);
+          cardsToKeep.push(card);
         }
       });
 
+      // Verificar que el número de cards coincida con uniqueItems
+      if (cardsToKeep.length !== uniqueItems.length) {
+        console.warn(`⚠️ [MenuSection] Discrepancia: ${cardsToKeep.length} cards en DOM vs ${uniqueItems.length} items únicos`);
+        
+        // Si hay más cards que items, eliminar los extras
+        if (cardsToKeep.length > uniqueItems.length) {
+          const extra = cardsToKeep.length - uniqueItems.length;
+          for (let i = 0; i < extra; i++) {
+            const lastCard = cardsToKeep.pop();
+            if (lastCard) {
+              lastCard.remove();
+              removed++;
+            }
+          }
+        }
+      }
+
       if (removed > 0) {
-        console.warn(`⚠️ [MenuSection] Se eliminaron ${removed} elementos duplicados del DOM`);
+        console.warn(`⚠️ [MenuSection] Se eliminaron ${removed} elementos duplicados del DOM en producción`);
       }
     };
 
-    // Ejecutar después de que React haya renderizado
-    const timeoutId = setTimeout(cleanupDuplicates, 50);
-    return () => clearTimeout(timeoutId);
-  }, [uniqueItems, componentId]);
+    // Ejecutar múltiples veces para asegurar limpieza completa
+    const timeoutId1 = setTimeout(cleanupDuplicates, 100);
+    const timeoutId2 = setTimeout(cleanupDuplicates, 500);
+    const timeoutId3 = setTimeout(cleanupDuplicates, 1000);
+    
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+    };
+  }, [uniqueItems, loading, componentId]);
 
   if (!category) {
     return null;
@@ -166,11 +198,13 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
     );
   }
 
+  // Renderizar sin StrictMode para evitar doble renderizado en producción
   return (
     <section 
       id={category.slug} 
       className="mb-16 scroll-mt-20"
       data-component-id={componentId.current}
+      suppressHydrationWarning
     >
       <div className="text-center mb-8">
         <h2 className="text-4xl font-cinzel text-gold-400 mb-4 relative inline-block px-8 py-4 bg-black/80 backdrop-blur-md rounded-lg border-2 border-gold-600" style={{textShadow: '0 0 10px rgba(212, 175, 55, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.8)'}}>
@@ -190,13 +224,18 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
         <div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           data-items-count={uniqueItems.length}
+          suppressHydrationWarning
         >
-          {uniqueItems.map((item, index) => (
-            <MenuItemCard 
-              key={`${componentId.current}-${item.id}-${index}`} 
-              item={item} 
-            />
-          ))}
+          {uniqueItems.map((item) => {
+            // Key única y estable
+            const itemKey = `item-${item.id}-${componentId.current}`;
+            return (
+              <MenuItemCard 
+                key={itemKey} 
+                item={item} 
+              />
+            );
+          })}
         </div>
       )}
     </section>
