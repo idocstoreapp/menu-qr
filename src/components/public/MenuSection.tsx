@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import MenuItemCard from './MenuItemCard';
 
 interface MenuItem {
@@ -30,6 +30,8 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<Category | null>(null);
+  const isFetchingRef = useRef(false);
+  const lastCategoryIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Si category es string (JSON), parsearlo
@@ -45,21 +47,29 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   }, [categoryProp]);
 
   useEffect(() => {
-    if (category) {
+    if (category && category.id !== lastCategoryIdRef.current) {
+      lastCategoryIdRef.current = category.id;
       fetchItems();
     }
   }, [category]);
 
   const fetchItems = async () => {
-    if (!category) return;
+    if (!category || isFetchingRef.current) {
+      console.log(`[MenuSection] Saltando fetch - category: ${category?.id}, isFetching: ${isFetchingRef.current}`);
+      return;
+    }
+    
+    isFetchingRef.current = true;
     setLoading(true);
+    console.log(`[MenuSection] Iniciando fetch para categoría ${category.id} (${category.name})`);
+    
     try {
       const response = await fetch(`/api/menu-items?categoryId=${category.id}&availableOnly=true`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log(`Items cargados para ${category.name}:`, data.length);
+      console.log(`[MenuSection] Items recibidos del API para ${category.name}:`, data.length);
       
       // Eliminar duplicados basándose en el ID (más robusto)
       if (!Array.isArray(data)) {
@@ -68,31 +78,32 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
         return;
       }
       
-      const itemsMap = new Map<number, MenuItem>();
-      const seenIds = new Set<number>();
+      // Usar un objeto simple para deduplicación más eficiente
+      const itemsById: Record<number, MenuItem> = {};
       
       for (const item of data) {
         const id = Number(item?.id);
         // Solo agregar si el ID es válido y no lo hemos visto antes
-        if (id && id > 0 && !seenIds.has(id)) {
-          seenIds.add(id);
-          itemsMap.set(id, item as MenuItem);
+        if (id && id > 0 && !itemsById[id]) {
+          itemsById[id] = item as MenuItem;
         }
       }
       
-      const uniqueItems = Array.from(itemsMap.values());
+      const uniqueItems = Object.values(itemsById);
       
       if (data.length !== uniqueItems.length) {
-        console.warn(`⚠️ Se encontraron ${data.length - uniqueItems.length} items duplicados en ${category.name}, eliminados.`);
+        console.warn(`⚠️ [MenuSection] Se encontraron ${data.length - uniqueItems.length} items duplicados en ${category.name}, eliminados.`);
       }
       
-      console.log(`Items únicos después de deduplicación: ${uniqueItems.length}`);
+      console.log(`[MenuSection] Items únicos después de deduplicación: ${uniqueItems.length} (de ${data.length} recibidos)`);
       setItems(uniqueItems);
     } catch (error) {
       console.error('Error fetching items:', error);
       setItems([]);
     } finally {
       setLoading(false);
+      isFetchingRef.current = false;
+      console.log(`[MenuSection] Fetch completado para categoría ${category.id}`);
     }
   };
 

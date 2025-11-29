@@ -106,8 +106,18 @@ export const GET: APIRoute = async ({ url }) => {
           : null,
       }));
       
-      console.log(`API: Devolviendo ${itemsWithCategories.length} items únicos (de ${items.length} totales) para categoría ${categoryId || 'todas'}`);
-      return jsonResponse(itemsWithCategories);
+      // Última verificación de duplicados antes de enviar
+      const finalItemsMap = new Map<number, any>();
+      for (const item of itemsWithCategories) {
+        const id = Number(item.id);
+        if (id && id > 0 && !finalItemsMap.has(id)) {
+          finalItemsMap.set(id, item);
+        }
+      }
+      const finalItems = Array.from(finalItemsMap.values());
+      
+      console.log(`[API] Devolviendo ${finalItems.length} items únicos (de ${items.length} consultados, ${itemsWithCategories.length} después de categorías) para categoría ${categoryId || 'todas'}`);
+      return jsonResponse(finalItems);
     } catch (drizzleError: any) {
       // Si falla por columna video_url, usar SQL directo sin esa columna
       if (drizzleError.message?.includes('video_url') || drizzleError.message?.includes('no such column')) {
@@ -223,8 +233,18 @@ export const GET: APIRoute = async ({ url }) => {
             : null,
         }));
         
-        console.log(`API: Devolviendo ${itemsWithCategories.length} items únicos (de ${result.rows.length} totales) para categoría ${categoryId || 'todas'} (SQL directo)`);
-        return jsonResponse(itemsWithCategories);
+        // Última verificación de duplicados antes de enviar
+        const finalItemsMap = new Map<number, any>();
+        for (const item of itemsWithCategories) {
+          const id = Number(item.id);
+          if (id && id > 0 && !finalItemsMap.has(id)) {
+            finalItemsMap.set(id, item);
+          }
+        }
+        const finalItems = Array.from(finalItemsMap.values());
+        
+        console.log(`[API SQL] Devolviendo ${finalItems.length} items únicos (de ${result.rows.length} filas, ${items.length} después de deduplicación, ${itemsWithCategories.length} después de categorías) para categoría ${categoryId || 'todas'}`);
+        return jsonResponse(finalItems);
       } else {
         throw drizzleError;
       }
