@@ -93,7 +93,15 @@ const currentCategory = allCategories.find(cat => cat.slug === categorySlug) || 
         <p class="text-gold-400 font-playfair text-lg">
           Gourmet Árabe - Sabores Auténticos del Medio Oriente
         </p>
-        <div class="pt-2 border-t border-gold-600/30">
+        <div class="pt-2 border-t border-gold-600/30 flex flex-col sm:flex-row justify-center items-center gap-4">
+          <a 
+            href="/print" 
+            class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors flex items-center gap-2"
+            title="Versión Imprimible del Menú"
+          >
+            🖨️ Menú Imprimible
+          </a>
+          <span class="text-gold-600/50 hidden sm:inline">|</span>
           <a 
             href="/admin/login" 
             class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors"
