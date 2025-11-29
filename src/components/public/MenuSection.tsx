@@ -32,6 +32,11 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   const [category, setCategory] = useState<Category | null>(null);
   const isFetchingRef = useRef(false);
   const lastCategoryIdRef = useRef<number | null>(null);
+  const renderCountRef = useRef(0);
+  
+  // Log cada vez que el componente se renderiza
+  renderCountRef.current += 1;
+  console.log(`[MenuSection] Render #${renderCountRef.current} - Items en estado: ${items.length}`);
 
   useEffect(() => {
     // Si category es string (JSON), parsearlo
@@ -147,9 +152,35 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item) => (
-            <MenuItemCard key={item.id} item={item} />
-          ))}
+          {(() => {
+            // Log para debugging - verificar si hay duplicados en el render
+            const itemIds = items.map(item => item.id);
+            const uniqueIds = new Set(itemIds);
+            if (itemIds.length !== uniqueIds.size) {
+              console.error(`🚨 [MenuSection] ERROR: Se detectaron ${itemIds.length - uniqueIds.size} IDs duplicados en el array de items al renderizar!`);
+              console.log('IDs duplicados:', itemIds.filter((id, index) => itemIds.indexOf(id) !== index));
+            }
+            console.log(`[MenuSection] Renderizando ${items.length} items con IDs:`, itemIds);
+            
+            // Asegurar que solo renderizamos items únicos
+            const seenIds = new Set<number>();
+            const uniqueItemsToRender = items.filter(item => {
+              if (seenIds.has(item.id)) {
+                console.warn(`⚠️ [MenuSection] Filtrando item duplicado con ID ${item.id} durante el render`);
+                return false;
+              }
+              seenIds.add(item.id);
+              return true;
+            });
+            
+            if (uniqueItemsToRender.length !== items.length) {
+              console.warn(`⚠️ [MenuSection] Se filtraron ${items.length - uniqueItemsToRender.length} items duplicados durante el render`);
+            }
+            
+            return uniqueItemsToRender.map((item) => (
+              <MenuItemCard key={item.id} item={item} />
+            ));
+          })()}
         </div>
       )}
     </section>
