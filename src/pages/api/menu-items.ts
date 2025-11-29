@@ -53,6 +53,30 @@ export const GET: APIRoute = async ({ url }) => {
 
       const items = await queryWithConditions.orderBy(asc(menuItems.order), asc(menuItems.name));
       
+      // Verificar si hay items con el mismo nombre (duplicados reales en la BD)
+      const itemsByName = new Map<string, any[]>();
+      for (const item of items) {
+        const key = `${item.name.toLowerCase().trim()}_${item.categoryId || 'null'}`;
+        if (!itemsByName.has(key)) {
+          itemsByName.set(key, []);
+        }
+        itemsByName.get(key)!.push(item);
+      }
+      
+      // Si hay duplicados por nombre, loguear advertencia
+      const duplicateNames: string[] = [];
+      for (const entry of Array.from(itemsByName.entries())) {
+        const [key, itemsList] = entry;
+        if (itemsList.length > 1) {
+          duplicateNames.push(`${itemsList[0].name} (${itemsList.length} veces)`);
+        }
+      }
+      
+      if (duplicateNames.length > 0) {
+        console.warn(`⚠️ [API] Se encontraron items duplicados en la base de datos por nombre:`, duplicateNames);
+        console.warn(`⚠️ [API] Usa POST /api/cleanup-duplicates para limpiarlos`);
+      }
+      
       // Eliminar duplicados por ID usando Map (más robusto)
       const itemsMap = new Map<number, any>();
       const seenIds = new Set<number>();
@@ -70,7 +94,7 @@ export const GET: APIRoute = async ({ url }) => {
       
       // Log para debugging
       if (items.length !== uniqueItems.length) {
-        console.log(`⚠️ Se encontraron ${items.length - uniqueItems.length} items duplicados, eliminados.`);
+        console.log(`⚠️ [API] Se encontraron ${items.length - uniqueItems.length} items con IDs duplicados en la consulta, eliminados.`);
       }
       
       // Obtener todas las categorías necesarias de una vez
