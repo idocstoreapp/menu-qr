@@ -102,6 +102,18 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
       }
       
       console.log(`[MenuSection-${instanceIdRef.current}] Items únicos después de deduplicación: ${uniqueItems.length} (de ${data.length} recibidos)`);
+      
+      // Verificar DOM después de un pequeño delay para ver si hay duplicados
+      setTimeout(() => {
+        const domElements = document.querySelectorAll(`[data-grid-instance="${instanceIdRef.current}"] > *`);
+        if (domElements.length !== uniqueItems.length) {
+          console.error(`🚨 [MenuSection-${instanceIdRef.current}] ERROR CRÍTICO: Hay ${domElements.length} elementos en el DOM pero solo ${uniqueItems.length} items en el estado!`);
+          console.error('Esto indica un problema de renderizado o hidratación de Astro.');
+        } else {
+          console.log(`✅ [MenuSection-${instanceIdRef.current}] DOM correcto: ${domElements.length} elementos renderizados`);
+        }
+      }, 100);
+      
       setItems(uniqueItems);
     } catch (error) {
       console.error(`[MenuSection-${instanceIdRef.current}] Error fetching items:`, error);
@@ -156,42 +168,13 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(() => {
-            // Log para debugging - verificar si hay duplicados en el render
-            const itemIds = items.map(item => item.id);
-            const uniqueIds = new Set(itemIds);
-            if (itemIds.length !== uniqueIds.size) {
-              console.error(`🚨 [MenuSection-${instanceIdRef.current}] ERROR: Se detectaron ${itemIds.length - uniqueIds.size} IDs duplicados en el array de items al renderizar!`);
-              console.log('IDs duplicados:', itemIds.filter((id, index) => itemIds.indexOf(id) !== index));
-            }
-            console.log(`[MenuSection-${instanceIdRef.current}] Renderizando ${items.length} items con IDs:`, itemIds);
-            
-            // Verificar cuántos elementos hay en el DOM
-            const domElements = document.querySelectorAll(`[data-menu-section-instance="${instanceIdRef.current}"] .grid > *`);
-            if (domElements.length > items.length) {
-              console.error(`🚨 [MenuSection-${instanceIdRef.current}] ERROR: Hay ${domElements.length} elementos en el DOM pero solo ${items.length} items en el estado!`);
-            }
-            
-            // Asegurar que solo renderizamos items únicos
-            const seenIds = new Set<number>();
-            const uniqueItemsToRender = items.filter(item => {
-              if (seenIds.has(item.id)) {
-                console.warn(`⚠️ [MenuSection] Filtrando item duplicado con ID ${item.id} durante el render`);
-                return false;
-              }
-              seenIds.add(item.id);
-              return true;
-            });
-            
-            if (uniqueItemsToRender.length !== items.length) {
-              console.warn(`⚠️ [MenuSection] Se filtraron ${items.length - uniqueItemsToRender.length} items duplicados durante el render`);
-            }
-            
-            return uniqueItemsToRender.map((item) => (
-              <MenuItemCard key={item.id} item={item} />
-            ));
-          })()}
+        <div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          data-grid-instance={instanceIdRef.current}
+        >
+          {items.map((item) => (
+            <MenuItemCard key={`${instanceIdRef.current}-${item.id}`} item={item} />
+          ))}
         </div>
       )}
     </section>
