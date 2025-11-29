@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import MenuItemCard from './MenuItemCard';
 
 interface MenuItem {
@@ -30,100 +30,89 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<Category | null>(null);
-  const isFetchingRef = useRef(false);
-  const lastCategoryIdRef = useRef<number | null>(null);
-  const renderCountRef = useRef(0);
-  const instanceIdRef = useRef(Math.random().toString(36).substring(7));
-  
-  // Log cada vez que el componente se renderiza
-  renderCountRef.current += 1;
-  console.log(`[MenuSection-${instanceIdRef.current}] Render #${renderCountRef.current} - Items en estado: ${items.length}`);
+  const fetchInProgress = useRef(false);
+  const mountedRef = useRef(true);
 
+  // Parsear categoría
   useEffect(() => {
-    // Si category es string (JSON), parsearlo
     if (typeof categoryProp === 'string') {
       try {
-        setCategory(JSON.parse(categoryProp));
+        const parsed = JSON.parse(categoryProp);
+        setCategory(parsed);
       } catch {
-        return;
+        setCategory(null);
       }
     } else {
       setCategory(categoryProp);
     }
   }, [categoryProp]);
 
+  // Fetch items
   useEffect(() => {
-    if (category && category.id !== lastCategoryIdRef.current) {
-      lastCategoryIdRef.current = category.id;
-      fetchItems();
-    }
+    if (!category || fetchInProgress.current) return;
+
+    const fetchItems = async () => {
+      if (!mountedRef.current || fetchInProgress.current) return;
+      
+      fetchInProgress.current = true;
+      setLoading(true);
+
+      try {
+        const response = await fetch(`/api/menu-items?categoryId=${category.id}&availableOnly=true`);
+        if (!response.ok) throw new Error('Failed to fetch');
+        
+        const data = await response.json();
+        
+        if (!Array.isArray(data)) {
+          setItems([]);
+          return;
+        }
+
+        // Deduplicación final usando objeto simple
+        const uniqueItemsMap: Record<number, MenuItem> = {};
+        for (const item of data) {
+          const id = Number(item?.id);
+          if (id && id > 0 && !uniqueItemsMap[id]) {
+            uniqueItemsMap[id] = item as MenuItem;
+          }
+        }
+
+        const uniqueItems = Object.values(uniqueItemsMap);
+        
+        if (mountedRef.current) {
+          setItems(uniqueItems);
+        }
+      } catch (error) {
+        console.error('Error fetching items:', error);
+        if (mountedRef.current) {
+          setItems([]);
+        }
+      } finally {
+        if (mountedRef.current) {
+          setLoading(false);
+          fetchInProgress.current = false;
+        }
+      }
+    };
+
+    fetchItems();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [category]);
 
-  const fetchItems = async () => {
-    if (!category || isFetchingRef.current) {
-      console.log(`[MenuSection-${instanceIdRef.current}] Saltando fetch - category: ${category?.id}, isFetching: ${isFetchingRef.current}`);
-      return;
-    }
-    
-    isFetchingRef.current = true;
-    setLoading(true);
-    console.log(`[MenuSection-${instanceIdRef.current}] Iniciando fetch para categoría ${category.id} (${category.name})`);
-    
-    try {
-      const response = await fetch(`/api/menu-items?categoryId=${category.id}&availableOnly=true`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  // Memoizar items únicos para evitar re-renders innecesarios
+  const uniqueItems = useMemo(() => {
+    const seen = new Set<number>();
+    return items.filter(item => {
+      if (seen.has(item.id)) {
+        return false;
       }
-      const data = await response.json();
-      console.log(`[MenuSection-${instanceIdRef.current}] Items recibidos del API para ${category.name}:`, data.length);
-      
-      // Eliminar duplicados basándose en el ID (más robusto)
-      if (!Array.isArray(data)) {
-        console.warn('⚠️ Los datos recibidos no son un array:', typeof data);
-        setItems([]);
-        return;
-      }
-      
-      // Usar un objeto simple para deduplicación más eficiente
-      const itemsById: Record<number, MenuItem> = {};
-      
-      for (const item of data) {
-        const id = Number(item?.id);
-        // Solo agregar si el ID es válido y no lo hemos visto antes
-        if (id && id > 0 && !itemsById[id]) {
-          itemsById[id] = item as MenuItem;
-        }
-      }
-      
-      const uniqueItems = Object.values(itemsById);
-      
-      if (data.length !== uniqueItems.length) {
-        console.warn(`⚠️ [MenuSection-${instanceIdRef.current}] Se encontraron ${data.length - uniqueItems.length} items duplicados en ${category.name}, eliminados.`);
-      }
-      
-      console.log(`[MenuSection-${instanceIdRef.current}] Items únicos después de deduplicación: ${uniqueItems.length} (de ${data.length} recibidos)`);
-      
-      // Verificar DOM después de un pequeño delay para ver si hay duplicados
-      setTimeout(() => {
-        const domElements = document.querySelectorAll(`[data-grid-instance="${instanceIdRef.current}"] > *`);
-        if (domElements.length !== uniqueItems.length) {
-          console.error(`🚨 [MenuSection-${instanceIdRef.current}] ERROR CRÍTICO: Hay ${domElements.length} elementos en el DOM pero solo ${uniqueItems.length} items en el estado!`);
-          console.error('Esto indica un problema de renderizado o hidratación de Astro.');
-        } else {
-          console.log(`✅ [MenuSection-${instanceIdRef.current}] DOM correcto: ${domElements.length} elementos renderizados`);
-        }
-      }, 100);
-      
-      setItems(uniqueItems);
-    } catch (error) {
-      console.error(`[MenuSection-${instanceIdRef.current}] Error fetching items:`, error);
-      setItems([]);
-    } finally {
-      setLoading(false);
-      isFetchingRef.current = false;
-      console.log(`[MenuSection-${instanceIdRef.current}] Fetch completado para categoría ${category.id}`);
-    }
-  };
+      seen.add(item.id);
+      return true;
+    });
+  }, [items]);
 
   if (!category) {
     return null;
@@ -131,18 +120,16 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="text-gold-400 text-xl">Cargando...</div>
-      </div>
+      <section id={category.slug} className="mb-16 scroll-mt-20">
+        <div className="text-center py-12">
+          <div className="text-gold-400 text-xl">Cargando...</div>
+        </div>
+      </section>
     );
   }
 
   return (
-    <section 
-      id={category.slug} 
-      className="mb-16 scroll-mt-20"
-      data-menu-section-instance={instanceIdRef.current}
-    >
+    <section id={category.slug} className="mb-16 scroll-mt-20">
       <div className="text-center mb-8">
         <h2 className="text-4xl font-cinzel text-gold-400 mb-4 relative inline-block px-8 py-4 bg-black/80 backdrop-blur-md rounded-lg border-2 border-gold-600" style={{textShadow: '0 0 10px rgba(212, 175, 55, 0.6), 2px 2px 4px rgba(0, 0, 0, 0.8)'}}>
           <span className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 text-2xl text-gold-400 opacity-90">✦</span>
@@ -152,32 +139,18 @@ export default function MenuSection({ category: categoryProp }: MenuSectionProps
         <div className="w-48 h-1 bg-gradient-to-r from-transparent via-gold-600 to-transparent mx-auto mt-2"></div>
       </div>
 
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="text-gold-400 text-xl">Cargando items...</div>
-        </div>
-      ) : items.length === 0 ? (
+      {uniqueItems.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gold-300 mb-2">No hay items disponibles en esta categoría</p>
           <p className="text-gold-400 text-sm">Categoría ID: {category.id} | Slug: {category.slug}</p>
-          <button 
-            onClick={() => fetchItems()} 
-            className="mt-4 px-4 py-2 bg-gold-600 text-black rounded hover:bg-gold-500 font-bold"
-          >
-            Reintentar
-          </button>
         </div>
       ) : (
-        <div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          data-grid-instance={instanceIdRef.current}
-        >
-          {items.map((item) => (
-            <MenuItemCard key={`${instanceIdRef.current}-${item.id}`} item={item} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {uniqueItems.map((item) => (
+            <MenuItemCard key={`item-${item.id}`} item={item} />
           ))}
         </div>
       )}
     </section>
   );
 }
-
