@@ -1,0 +1,110 @@
+---
+import PublicLayout from '../layouts/PublicLayout.astro';
+import { supabase } from '../lib/supabase';
+
+// Obtener categorías activas que tienen items disponibles
+const { data: allItems, error: itemsError } = await supabase
+  .from('menu_items')
+  .select('category_id')
+  .eq('is_available', true);
+
+const categoryIdsWithItems = [...new Set((allItems || []).map(item => item.category_id).filter(Boolean))];
+
+let activeCategories: any[] = [];
+if (categoryIdsWithItems.length > 0) {
+  const { data: cats } = await supabase
+    .from('categories')
+    .select('*')
+    .eq('is_active', true)
+    .in('id', categoryIdsWithItems)
+    .order('order_num', { ascending: true });
+  
+  activeCategories = cats || [];
+}
+---
+
+<PublicLayout title="Menú Digital - Gourmet Árabe">
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="text-center">
+      <div class="mb-8">
+        <div class="w-48 h-48 md:w-64 md:h-64 mx-auto mb-8 animate-float">
+          <img 
+            src="/logo-cropped.png" 
+            alt="Gourmet Árabe Logo" 
+            class="w-full h-full object-contain rounded-full shadow-2xl"
+            style="box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);"
+          />
+        </div>
+      </div>
+
+      {activeCategories.length > 0 ? (
+        <div class="space-y-4">
+          <p class="text-gold-300 text-xl mb-6 px-6 py-3 bg-black/70 backdrop-blur-sm rounded-lg border-2 border-gold-600 inline-block mx-auto" style="text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.8);">
+            Selecciona una categoría del menú:
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            {activeCategories.map((category) => (
+              <a
+                href={`/menu/${category.slug}`}
+                class="px-6 py-4 bg-gold-600 hover:bg-gold-500 text-black font-bold rounded-lg transition transform hover:scale-105 shadow-lg border-2 border-gold-400 hover:border-gold-300 text-lg"
+              >
+                {category.name}
+              </a>
+            ))}
+          </div>
+          
+          <!-- Botón ver todo el menú -->
+          <div class="mt-8">
+            <a
+              href="/menu"
+              class="inline-flex items-center gap-2 px-8 py-4 bg-terracotta-600 hover:bg-terracotta-500 text-white font-bold rounded-lg transition transform hover:scale-105 shadow-lg text-lg"
+            >
+              📖 Ver Menú Completo
+            </a>
+          </div>
+        </div>
+      ) : (
+        <div class="text-center py-12">
+          <p class="text-gold-400 text-xl mb-4 px-6 py-3 bg-black/70 backdrop-blur-sm rounded-lg border-2 border-gold-600 inline-block" style="text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 2px 2px 4px rgba(0, 0, 0, 0.8);">
+            Menú en preparación
+          </p>
+          <p class="text-gold-300 mb-6 px-4 py-2 bg-black/60 backdrop-blur-sm rounded-lg inline-block">
+            Estamos preparando nuestro menú digital
+          </p>
+          <p class="text-gold-300 text-sm mt-4 px-4 py-2 bg-black/60 backdrop-blur-sm rounded-lg inline-block">
+            Inicia sesión en el <a href="/admin/login" class="text-gold-400 hover:text-gold-300 underline">panel de administración</a> para agregar productos
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+
+  <footer class="bg-black/70 backdrop-blur-sm border-t-4 border-gold-600 mt-16 py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+      <p class="text-gold-400 font-playfair text-lg">
+        Gourmet Árabe - Sabores Auténticos del Medio Oriente
+      </p>
+      <p class="text-gold-300 font-playfair text-base">
+        📱 +56 9 3945 9286
+      </p>
+      <div class="pt-2 border-t border-gold-600/30 flex flex-col sm:flex-row justify-center items-center gap-4">
+        <a 
+          href="/menu/print" 
+          class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors flex items-center gap-2"
+          title="Versión Imprimible del Menú"
+        >
+          🖨️ Menú Imprimible
+        </a>
+        <span class="text-gold-600/50 hidden sm:inline">|</span>
+        <a 
+          href="/admin/login" 
+          class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors"
+          title="Acceso Administrativo"
+        >
+          🔐 Acceso Admin
+        </a>
+      </div>
+    </div>
+  </footer>
+</PublicLayout>
+

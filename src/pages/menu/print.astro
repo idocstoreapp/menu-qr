@@ -1,0 +1,447 @@
+---
+import PublicLayout from '../../layouts/PublicLayout.astro';
+import { supabase } from '../../lib/supabase';
+
+// Obtener categorías activas
+const { data: categories } = await supabase
+  .from('categories')
+  .select('*')
+  .eq('is_active', true)
+  .order('order_num', { ascending: true });
+
+// Obtener items disponibles
+const { data: items } = await supabase
+  .from('menu_items')
+  .select('*')
+  .eq('is_available', true)
+  .order('order_num', { ascending: true });
+
+// Agrupar items por categoría
+const itemsByCategory = new Map();
+for (const item of items || []) {
+  if (item.category_id) {
+    if (!itemsByCategory.has(item.category_id)) {
+      itemsByCategory.set(item.category_id, []);
+    }
+    itemsByCategory.get(item.category_id).push(item);
+  }
+}
+
+// Filtrar categorías con items
+const categoriesForPrint = (categories || []).filter(cat => 
+  itemsByCategory.has(cat.id) && itemsByCategory.get(cat.id).length > 0
+).map(cat => ({
+  ...cat,
+  items: itemsByCategory.get(cat.id)
+}));
+
+// Dividir en páginas (máximo ~12 items por página para mejor visualización)
+const itemsPerPage = 12;
+let totalItems = 0;
+for (const cat of categoriesForPrint) {
+  totalItems += cat.items.length;
+}
+
+// Calcular número de páginas necesarias
+const estimatedPages = Math.max(2, Math.ceil(totalItems / itemsPerPage));
+const categoriesPerPage = Math.ceil(categoriesForPrint.length / estimatedPages);
+
+// Dividir categorías en páginas
+const pages: typeof categoriesForPrint[] = [];
+for (let i = 0; i < categoriesForPrint.length; i += categoriesPerPage) {
+  pages.push(categoriesForPrint.slice(i, i + categoriesPerPage));
+}
+
+const formatPrice = (price: number) => {
+  if (price === 0) return 'Consultar';
+  return new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    minimumFractionDigits: 0,
+  }).format(price);
+};
+---
+
+<PublicLayout title="Menú Imprimible - Gourmet Árabe">
+  <div class="print-container">
+    {pages.map((pageCategories, pageIndex) => (
+      <div class="print-page">
+        <div class="print-header">
+          <img src="/logo-cropped.png" alt="Gourmet Árabe" class="print-logo" />
+          <h1 class="print-title">GOURMET ÁRABE</h1>
+          <p class="print-subtitle">Sabores Auténticos del Medio Oriente</p>
+          <p class="print-phone">📱 +56 9 3945 9286</p>
+        </div>
+
+        {pageCategories.map((category) => (
+          <div class="print-category">
+            <h2 class="print-category-title">{category.name.toUpperCase()}</h2>
+            <div class="print-items-grid">
+              {category.items?.map((item: any) => (
+                <div class="print-item">
+                  <div class="print-item-content">
+                    <h3 class="print-item-name">{item.name}</h3>
+                    {item.description && (
+                      <p class="print-item-description">{item.description}</p>
+                    )}
+                  </div>
+                  <div class="print-item-price-box">
+                    <span class="print-item-price">{formatPrice(item.price)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    ))}
+  </div>
+</PublicLayout>
+
+<style>
+  @media print {
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+
+    body {
+      background: #1a1a1a !important;
+      background-image: url('/fondo.png') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      background-attachment: fixed !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .print-container {
+      display: block;
+      width: 100%;
+      background: transparent;
+    }
+
+    .print-page {
+      page-break-after: always;
+      page-break-inside: avoid;
+      width: 210mm;
+      min-height: 297mm;
+      padding: 12mm;
+      background: #1a1a1a !important;
+      background-image: url('/fondo.png') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .print-page:last-child {
+      page-break-after: auto;
+    }
+
+    .print-header {
+      text-align: center;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #d4af37 !important;
+    }
+
+    .print-logo {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 8px;
+      display: block;
+    }
+
+    .print-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #d4af37 !important;
+      margin: 8px 0 4px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .print-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-size: 12px;
+      color: #d4af37 !important;
+      margin: 0;
+      font-style: italic;
+    }
+
+    .print-phone {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px;
+      color: #d4af37 !important;
+      margin: 4px 0 0 0;
+    }
+
+    .print-category {
+      margin-bottom: 18px;
+      page-break-inside: avoid;
+    }
+
+    .print-category-title {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #d4af37 !important;
+      margin: 0 0 10px 0;
+      padding: 6px 0;
+      border-bottom: 2px solid #d4af37 !important;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .print-items-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+    }
+
+    .print-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: rgba(0, 0, 0, 0.75) !important;
+      border: 1.5px solid #d4af37 !important;
+      border-radius: 5px;
+      padding: 7px 9px;
+      page-break-inside: avoid;
+      min-height: 42px;
+    }
+
+    .print-item-content {
+      flex: 1;
+      margin-right: 9px;
+    }
+
+    .print-item-name {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: #d4af37 !important;
+      margin: 0 0 2px 0;
+      line-height: 1.2;
+    }
+
+    .print-item-description {
+      font-family: 'Playfair Display', serif;
+      font-size: 9px;
+      color: #f5e6d3 !important;
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    .print-item-price-box {
+      min-width: 70px;
+      width: 70px;
+      height: 35px;
+      background: #d4af37 !important;
+      border: 2px solid #b8941f !important;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .print-item-price {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1a1a1a !important;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    header, footer, nav, .no-print, .print-button {
+      display: none !important;
+    }
+  }
+
+  @media screen {
+    body {
+      background-image: url('/fondo.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    .print-container {
+      max-width: 210mm;
+      margin: 20px auto;
+      padding: 20px;
+    }
+
+    .print-page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 15mm;
+      background: white;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      background-image: url('/fondo.png');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .print-header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 3px solid #d4af37;
+    }
+
+    .print-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 10px;
+      display: block;
+    }
+
+    .print-title {
+      font-family: 'Cinzel', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #d4af37;
+      margin: 10px 0 5px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .print-subtitle {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      color: #d4af37;
+      margin: 0;
+      font-style: italic;
+    }
+
+    .print-phone {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      color: #d4af37;
+      margin: 6px 0 0 0;
+    }
+
+    .print-category {
+      margin-bottom: 25px;
+    }
+
+    .print-category-title {
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #d4af37;
+      margin: 0 0 12px 0;
+      padding: 8px 0;
+      border-bottom: 2px solid #d4af37;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .print-items-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .print-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+      border: 1px solid #d4af37;
+      border-radius: 6px;
+      padding: 10px 12px;
+      min-height: 50px;
+    }
+
+    .print-item-content {
+      flex: 1;
+      margin-right: 12px;
+    }
+
+    .print-item-name {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #d4af37;
+      margin: 0 0 4px 0;
+      line-height: 1.3;
+    }
+
+    .print-item-description {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px;
+      color: #f5e6d3;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .print-item-price-box {
+      min-width: 80px;
+      width: 80px;
+      height: 40px;
+      background: #d4af37;
+      border: 2px solid #b8941f;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .print-item-price {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a1a1a;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .print-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #d4af37;
+      color: #1a1a1a;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+    }
+
+    .print-button:hover {
+      background: #b8941f;
+    }
+  }
+</style>
+
+<button class="print-button" id="print-btn">🖨️ Imprimir Menú</button>
+
+<script is:inline>
+  (function() {
+    const printBtn = document.getElementById('print-btn');
+    if (printBtn) {
+      printBtn.addEventListener('click', function() {
+        window.print();
+      });
+    }
+  })();
+</script>
+

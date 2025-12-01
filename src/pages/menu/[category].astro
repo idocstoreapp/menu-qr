@@ -1,0 +1,161 @@
+---
+import PublicLayout from '../../layouts/PublicLayout.astro';
+import { supabase } from '../../lib/supabase';
+
+const { category: categorySlug } = Astro.params;
+
+// Obtener la categoría por slug
+const { data: category, error: catError } = await supabase
+  .from('categories')
+  .select('*')
+  .eq('slug', categorySlug)
+  .eq('is_active', true)
+  .single();
+
+if (!category) {
+  return Astro.redirect('/menu');
+}
+
+// Obtener items de esta categoría
+const { data: items, error: itemsError } = await supabase
+  .from('menu_items')
+  .select('*')
+  .eq('category_id', category.id)
+  .eq('is_available', true)
+  .order('order_num', { ascending: true });
+
+// Obtener todas las categorías para navegación
+const { data: allCategories } = await supabase
+  .from('categories')
+  .select('*')
+  .eq('is_active', true)
+  .order('order_num', { ascending: true });
+
+const formatPrice = (price: number) => {
+  if (price === 0) return 'Consultar';
+  return new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    minimumFractionDigits: 0,
+  }).format(price);
+};
+---
+
+<PublicLayout title={`${category.name} - Gourmet Árabe`}>
+  <div class="min-h-screen py-8 px-4">
+    <div class="max-w-6xl mx-auto">
+      <!-- Header -->
+      <header class="text-center mb-8">
+        <a href="/" class="inline-block mb-4">
+          <img 
+            src="/logo-cropped.png" 
+            alt="Gourmet Árabe Logo" 
+            class="w-24 h-24 object-contain rounded-full shadow-xl mx-auto"
+            style="box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);"
+          />
+        </a>
+        <h1 class="text-3xl md:text-4xl font-cinzel text-gold-400 mb-2" style="text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);">
+          {category.name}
+        </h1>
+        {category.description && (
+          <p class="text-gold-300/80">{category.description}</p>
+        )}
+      </header>
+
+      <!-- Navegación de categorías -->
+      <nav class="mb-8 overflow-x-auto pb-2">
+        <div class="flex gap-2 justify-center min-w-max">
+          {allCategories?.map((cat) => (
+            <a 
+              href={`/menu/${cat.slug}`}
+              class={`px-4 py-2 rounded-lg transition whitespace-nowrap ${
+                cat.slug === categorySlug
+                  ? 'bg-gold-600 text-arabic-dark font-bold'
+                  : 'bg-black/50 text-gold-400 border border-gold-600 hover:bg-gold-600/20'
+              }`}
+            >
+              {cat.name}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      <!-- Items del menú -->
+      {items && items.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {items.map((item) => (
+            <div class="bg-black/60 backdrop-blur-sm border border-gold-600 rounded-xl overflow-hidden hover:border-gold-400 transition group">
+              {/* Imagen del producto */}
+              {item.image_url && (
+                <div class="relative h-48 overflow-hidden">
+                  <img 
+                    src={item.image_url} 
+                    alt={item.name}
+                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    loading="lazy"
+                  />
+                  {item.is_featured && (
+                    <span class="absolute top-2 right-2 bg-gold-600 text-arabic-dark px-2 py-1 rounded text-xs font-bold">
+                      ⭐ Destacado
+                    </span>
+                  )}
+                </div>
+              )}
+              
+              {/* Contenido */}
+              <div class="p-4">
+                <div class="flex justify-between items-start gap-3">
+                  <div class="flex-1">
+                    <h3 class="text-gold-400 font-cinzel font-bold text-lg mb-1">
+                      {item.name}
+                      {!item.image_url && item.is_featured && (
+                        <span class="ml-2 text-xs">⭐</span>
+                      )}
+                    </h3>
+                    {item.description && (
+                      <p class="text-gold-200/80 text-sm line-clamp-2">{item.description}</p>
+                    )}
+                  </div>
+                  <div class="bg-gold-600 text-arabic-dark px-3 py-2 rounded-lg font-bold text-lg whitespace-nowrap flex-shrink-0">
+                    {formatPrice(item.price)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-16">
+          <p class="text-gold-400 text-xl mb-4">No hay items disponibles en esta categoría</p>
+          <a href="/menu" class="text-gold-300 hover:text-gold-400 underline">Ver todo el menú</a>
+        </div>
+      )}
+
+      <!-- Navegación inferior -->
+      <div class="mt-12 text-center">
+        <a 
+          href="/menu"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-terracotta-600 hover:bg-terracotta-500 text-white font-bold rounded-lg transition"
+        >
+          📖 Ver Menú Completo
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-black/70 backdrop-blur-sm border-t-4 border-gold-600 mt-16 py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+      <p class="text-gold-400 font-playfair text-lg">
+        Gourmet Árabe - Sabores Auténticos del Medio Oriente
+      </p>
+      <p class="text-gold-300 font-playfair text-base">
+        📱 +56 9 3945 9286
+      </p>
+      <div class="pt-2 border-t border-gold-600/30 flex justify-center gap-4">
+        <a href="/" class="text-gold-300 hover:text-gold-400 text-sm underline">🏠 Inicio</a>
+        <a href="/menu/print" class="text-gold-300 hover:text-gold-400 text-sm underline">🖨️ Menú Imprimible</a>
+      </div>
+    </div>
+  </footer>
+</PublicLayout>
+
