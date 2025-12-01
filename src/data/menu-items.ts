@@ -36,17 +36,17 @@ export const staticMenuItems: StaticMenuItem[] = [
   { id: 13, name: 'Promo Shawarma Duo Clásico Mixto', description: 'Para 2 personas. Pan árabe (24cm), pollo + carne (vacuno) + vegetales, 4 falafel, 2 salsas, 1 papas fritas pequeñas, 2 bebidas a elección', price: 23990, categorySlug: 'promociones', order: 2, isAvailable: true, isFeatured: true },
 
   // Menú del Día - Pollo
-  { id: 14, name: 'Pollo a la Plancha', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 1, isAvailable: true },
-  { id: 15, name: 'Pollo a la Aceituna', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 2, isAvailable: true },
-  { id: 16, name: 'Pollo a la Ciruela', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 3, isAvailable: true },
-  { id: 17, name: 'Pollo Arvejado', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 4, isAvailable: true },
-  { id: 18, name: 'Pollo Guisado con Verduras', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 5, isAvailable: true },
-  { id: 19, name: 'Tomatican de Pollo', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 6, isAvailable: true },
+  { id: 14, name: 'Pollo a la Plancha', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 1, isAvailable: true },
+  { id: 15, name: 'Pollo a la Aceituna', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 2, isAvailable: true },
+  { id: 16, name: 'Pollo a la Ciruela', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 3, isAvailable: true },
+  { id: 17, name: 'Pollo Arvejado', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 4, isAvailable: true },
+  { id: 18, name: 'Pollo Guisado con Verduras', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 5, isAvailable: true },
+  { id: 19, name: 'Tomatican de Pollo', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 6, isAvailable: true },
 
   // Menú del Día - Guisos
-  { id: 20, name: 'Guisado de 3 Lentejas', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 7, isAvailable: true },
-  { id: 21, name: 'Guisado de Garbanzos', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 8, isAvailable: true },
-  { id: 22, name: 'Guisado de Berenjena', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 9, isAvailable: true },
+  { id: 20, name: 'Guisado de 3 Lentejas', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 7, isAvailable: true },
+  { id: 21, name: 'Guisado de Garbanzos', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 8, isAvailable: true },
+  { id: 22, name: 'Guisado de Berenjena', description: 'Con consome, arroz arabe o cuscus o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 9, isAvailable: true },
   { id: 23, name: 'Consomé Individual', description: 'Consomé por separado', price: 2000, categorySlug: 'menu-del-dia', order: 10, isAvailable: true },
 
   // Acompañamiento - Salsas
