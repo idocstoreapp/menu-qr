@@ -20,7 +20,7 @@ export const staticMenuItems: StaticMenuItem[] = [
   { id: 1, name: 'Hummus con Pan', description: 'Cremoso hummus tradicional servido con pan árabe fresco', price: 0, categorySlug: 'entradas', order: 1, isAvailable: true },
   { id: 2, name: 'Baba Ganoush con Pan', description: 'Berenjena ahumada con tahini y especias', price: 0, categorySlug: 'entradas', order: 2, isAvailable: true },
   { id: 3, name: 'Falafel para Picar (6 und.)', description: 'Croquetas de garbanzos fritas, crujientes por fuera y suaves por dentro', price: 0, categorySlug: 'entradas', order: 3, isAvailable: true },
-  { id: 4, name: 'Kebab para Picar (2 unidades)', description: 'Brochetas de carne marinada y especiada', price: 0, categorySlug: 'entradas', order: 4, isAvailable: true },
+  { id: 4, name: 'Kebab para Picar (2 unid.)', description: 'Brochetas de carne marinada y especiada', price: 0, categorySlug: 'entradas', order: 4, isAvailable: true },
   { id: 5, name: 'Kubbeh (5 unid.)', description: 'Croquetas de trigo bulgur rellenas de carne y especias', price: 0, categorySlug: 'entradas', order: 5, isAvailable: true },
   { id: 6, name: 'Hojas de Parra - Vegana ó Carne (12 und.)', description: 'Hojas de parra rellenas, disponibles en versión vegana o con carne', price: 0, categorySlug: 'entradas', order: 6, isAvailable: true },
   { id: 7, name: 'Repollitos - Vegano ó Carne (10 unid.)', description: 'Repollitos rellenos, opción vegana o con carne', price: 0, categorySlug: 'entradas', order: 7, isAvailable: true },
@@ -36,17 +36,17 @@ export const staticMenuItems: StaticMenuItem[] = [
   { id: 13, name: 'Promo Shawarma Duo Clásico Mixto', description: 'Para 2 personas. Pan árabe (24cm), pollo + carne (vacuno) + vegetales, 4 falafel, 2 salsas, 1 papas fritas pequeñas, 2 bebidas a elección', price: 23990, categorySlug: 'promociones', order: 2, isAvailable: true, isFeatured: true },
 
   // Menú del Día - Pollo
-  { id: 14, name: 'Pollo a la Plancha', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 1, isAvailable: true },
-  { id: 15, name: 'Pollo a la Aceituna', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 2, isAvailable: true },
-  { id: 16, name: 'Pollo a la Ciruela', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 3, isAvailable: true },
-  { id: 17, name: 'Pollo Arvejado', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 4, isAvailable: true },
-  { id: 18, name: 'Pollo Guisado de Verduras', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 5, isAvailable: true },
-  { id: 19, name: 'Tomatican de Pollo', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 6, isAvailable: true },
+  { id: 14, name: 'Pollo a la Plancha', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 1, isAvailable: true },
+  { id: 15, name: 'Pollo a la Aceituna', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 2, isAvailable: true },
+  { id: 16, name: 'Pollo a la Ciruela', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 3, isAvailable: true },
+  { id: 17, name: 'Pollo Arvejado', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 4, isAvailable: true },
+  { id: 18, name: 'Pollo Guisado con Verduras', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 5, isAvailable: true },
+  { id: 19, name: 'Tomatican de Pollo', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 6, isAvailable: true },
 
   // Menú del Día - Guisos
-  { id: 20, name: 'Guisado de Lentejas', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 7, isAvailable: true },
-  { id: 21, name: 'Guisado de Garbanzos', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 8, isAvailable: true },
-  { id: 22, name: 'Guisado de Berenjena', description: 'Con consomé, ensalada, postre, arroz árabe o papas fritas, y té árabe', price: 6900, categorySlug: 'menu-del-dia', order: 9, isAvailable: true },
+  { id: 20, name: 'Guisado de 3 Lentejas', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 7, isAvailable: true },
+  { id: 21, name: 'Guisado de Garbanzos', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 8, isAvailable: true },
+  { id: 22, name: 'Guisado de Berenjena', description: 'Con consome, arroz arabe o cusco o papas fritas o papas rusticas, postre y te arabe', price: 6900, categorySlug: 'menu-del-dia', order: 9, isAvailable: true },
   { id: 23, name: 'Consomé Individual', description: 'Consomé por separado', price: 2000, categorySlug: 'menu-del-dia', order: 10, isAvailable: true },
 
   // Acompañamiento - Salsas
@@ -56,8 +56,8 @@ export const staticMenuItems: StaticMenuItem[] = [
 
   // Bebestibles
   { id: 27, name: 'Tetera de Té Verde', description: 'Té verde aromático servido en tetera tradicional', price: 0, categorySlug: 'bebestibles', order: 1, isAvailable: true },
-  { id: 28, name: 'Tetera de Té Jamaica', description: 'Té de jamaica refrescante servido en tetera', price: 0, categorySlug: 'bebestibles', order: 2, isAvailable: true },
-  { id: 29, name: 'Café Tradicional', description: 'Café árabe tradicional preparado a la manera clásica', price: 0, categorySlug: 'bebestibles', order: 3, isAvailable: true },
+  { id: 28, name: 'Tetera de Té Karkadé', description: 'Té Karkadé refrescante servido en tetera', price: 0, categorySlug: 'bebestibles', order: 2, isAvailable: true },
+  { id: 29, name: 'Café Arabe', description: 'Cafe arabe tradicional preparado a la manera del medio oriente', price: 0, categorySlug: 'bebestibles', order: 3, isAvailable: true },
   { id: 30, name: 'Café Cardamomo', description: 'Café árabe con cardamomo, especiado y aromático', price: 0, categorySlug: 'bebestibles', order: 4, isAvailable: true },
   { id: 31, name: 'Bebidas Lata (Variedad)', description: 'Variedad de bebidas en lata', price: 0, categorySlug: 'bebestibles', order: 5, isAvailable: true },
   { id: 32, name: 'Agua Mineral con Gas', description: 'Agua mineral con gas', price: 0, categorySlug: 'bebestibles', order: 6, isAvailable: true },

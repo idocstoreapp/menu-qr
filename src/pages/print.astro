@@ -117,6 +117,7 @@ const formatPrice = (price: number) => {
           <img src="/logo-cropped.png" alt="Gourmet Árabe" class="print-logo" />
           <h1 class="print-title">GOURMET ÁRABE</h1>
           <p class="print-subtitle">Sabores Auténticos del Medio Oriente</p>
+          <p class="print-phone">📱 +56 9 3945 9286</p>
         </div>
 
         {pageCategories.map((category) => (
@@ -230,6 +231,15 @@ const formatPrice = (price: number) => {
       color: #d4af37 !important;
       margin: 0;
       font-style: italic;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .print-phone {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px;
+      color: #d4af37 !important;
+      margin: 4px 0 0 0;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -388,6 +398,13 @@ const formatPrice = (price: number) => {
       color: #d4af37;
       margin: 0;
       font-style: italic;
+    }
+
+    .print-phone {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      color: #d4af37;
+      margin: 6px 0 0 0;
     }
 
     .print-category {
