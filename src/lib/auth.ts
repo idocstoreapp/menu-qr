@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = import.meta.env.JWT_SECRET || import.meta.env.PUBLIC_JWT_SECRET || 'your-secret-key-change-in-production';
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10);
