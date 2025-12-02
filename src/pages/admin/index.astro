@@ -1,51 +1,99 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import AdminMenuManager from '../../components/admin/AdminMenuManager';
+import CategoryManager from '../../components/admin/CategoryManager';
+import MenuItemManagerV2 from '../../components/admin/MenuItemManagerV2';
 import { getAuthUser } from '../../lib/api-helpers';
-import { initDatabase } from '../../db/index';
-
-await initDatabase();
 
 // Verificar autenticación
 const user = getAuthUser(Astro);
 if (!user) {
   return Astro.redirect('/admin/login');
 }
+
+// Obtener tab activo de la URL
+const activeTab = Astro.url.searchParams.get('tab') || 'items';
 ---
 
-<AdminLayout title="Panel de Administración">
+<AdminLayout title="Panel de Administración - Gourmet Árabe">
   <div class="min-h-screen p-4 md:p-8">
     <div class="max-w-7xl mx-auto">
+      <!-- Header -->
       <header class="mb-8">
-        <h1 class="text-2xl md:text-4xl font-cinzel text-gold-400 mb-4">Panel de Administración</h1>
-        <nav class="flex flex-col md:flex-row gap-2 md:gap-4 mb-6">
-          <div class="flex flex-wrap gap-2 md:gap-4">
-            <a href="/admin" class="bg-gold-600 text-arabic-dark px-4 py-2 rounded hover:bg-gold-500 transition text-sm md:text-base">
-              Items del Menú
-            </a>
-            <a href="/admin/combo-menus" class="bg-arabic-brown text-gold-400 px-4 py-2 rounded hover:bg-terracotta-600 transition text-sm md:text-base">
-              Menús Combinados
-            </a>
-            <a href="/admin/promotions" class="bg-arabic-brown text-gold-400 px-4 py-2 rounded hover:bg-terracotta-600 transition text-sm md:text-base">
-              Promociones
-            </a>
-            <a href="/admin/daily-menu" class="bg-arabic-brown text-gold-400 px-4 py-2 rounded hover:bg-terracotta-600 transition text-sm md:text-base">
-              Menú del Día
-            </a>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <div>
+            <h1 class="text-2xl md:text-4xl font-cinzel text-gold-400">Panel de Administración</h1>
+            <p class="text-gold-300/70 mt-1">Gestiona tu menú digital</p>
           </div>
-          <form method="POST" action="/api/logout" class="md:ml-auto">
-            <button type="submit" class="w-full md:w-auto bg-red-600 text-cream px-4 py-2 rounded hover:bg-red-500 transition text-sm md:text-base">
-              Cerrar Sesión
-            </button>
-          </form>
+          <div class="flex flex-wrap gap-3">
+            <a 
+              href="/" 
+              target="_blank"
+              class="bg-arabic-brown text-gold-400 px-4 py-2 rounded-lg hover:bg-terracotta-600 transition flex items-center gap-2 text-sm"
+            >
+              👁️ Ver Menú
+            </a>
+            <a 
+              href="/print" 
+              target="_blank"
+              class="bg-arabic-brown text-gold-400 px-4 py-2 rounded-lg hover:bg-terracotta-600 transition flex items-center gap-2 text-sm"
+            >
+              🖨️ Imprimir
+            </a>
+            <form method="POST" action="/api/logout">
+              <button type="submit" class="bg-red-600 text-cream px-4 py-2 rounded-lg hover:bg-red-500 transition text-sm">
+                🚪 Salir
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Tabs de navegación -->
+        <nav class="flex gap-2 border-b-2 border-gold-600/30 pb-0">
+          <a 
+            href="/admin?tab=items"
+            class={`px-6 py-3 rounded-t-lg transition font-medium ${
+              activeTab === 'items' 
+                ? 'bg-gold-600 text-arabic-dark' 
+                : 'bg-arabic-brown text-gold-400 hover:bg-terracotta-600'
+            }`}
+          >
+            🍽️ Items del Menú
+          </a>
+          <a 
+            href="/admin?tab=categories"
+            class={`px-6 py-3 rounded-t-lg transition font-medium ${
+              activeTab === 'categories' 
+                ? 'bg-gold-600 text-arabic-dark' 
+                : 'bg-arabic-brown text-gold-400 hover:bg-terracotta-600'
+            }`}
+          >
+            📁 Categorías
+          </a>
         </nav>
       </header>
 
+      <!-- Contenido según tab activo -->
       <div class="bg-arabic-dark p-4 md:p-6 rounded-lg border-2 border-gold-600">
-        <AdminMenuManager client:load />
+        {activeTab === 'items' && (
+          <MenuItemManagerV2 client:load />
+        )}
+        {activeTab === 'categories' && (
+          <CategoryManager client:load />
+        )}
+      </div>
+
+      <!-- Información adicional -->
+      <div class="mt-8 bg-arabic-brown/50 border border-gold-600/30 rounded-lg p-4">
+        <h3 class="text-gold-400 font-semibold mb-2">💡 Consejos</h3>
+        <ul class="text-gold-300/80 text-sm space-y-1">
+          <li>• <strong>Agregar producto:</strong> Clic en "Nuevo Item" → Llena el formulario con nombre, precio, descripción e imagen</li>
+          <li>• <strong>Editar producto:</strong> Clic en "✏️ Editar" en cualquier item</li>
+          <li>• <strong>Ocultar temporalmente:</strong> Usa el botón "Disponible/No disp." para items agotados</li>
+          <li>• <strong>Subir imagen:</strong> En el formulario de edición, selecciona una imagen (máx 5MB)</li>
+          <li>• <strong>Reordenar:</strong> Cambia el número de "Orden" para controlar la posición</li>
+          <li>• Los cambios se reflejan inmediatamente en el menú público y la versión imprimible</li>
+        </ul>
       </div>
     </div>
   </div>
 </AdminLayout>
-
-

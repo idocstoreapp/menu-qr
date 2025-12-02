@@ -62,12 +62,9 @@ CREATE TRIGGER update_menu_items_updated_at
 -- DATOS INICIALES
 -- =====================================================
 
--- Crear usuario admin por defecto (password: admin123)
--- IMPORTANTE: Cambiar esta contraseña en producción
--- Hash generado con bcrypt para 'admin123'
-INSERT INTO admin_users (username, password_hash) 
-VALUES ('admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi')
-ON CONFLICT (username) DO NOTHING;
+-- El usuario admin se crea automáticamente al primer login
+-- Credenciales: admin / admin123
+-- El sistema creará el hash correcto de bcrypt automáticamente
 
 -- Categorías por defecto
 INSERT INTO categories (name, slug, order_num, is_active) VALUES

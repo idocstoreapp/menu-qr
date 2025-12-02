@@ -1,95 +1,48 @@
 ---
 import PublicLayout from '../layouts/PublicLayout.astro';
-import { initDatabase } from '../db/index';
-import { db } from '../db/index';
-import { categories } from '../db/schema';
-import { eq, asc } from 'drizzle-orm';
-import { staticMenuItems } from '../data/menu-items';
-import { sql } from 'drizzle-orm';
+import { supabase } from '../lib/supabase';
 
-await initDatabase();
+// Obtener categorías activas
+const { data: categories } = await supabase
+  .from('categories')
+  .select('*')
+  .eq('is_active', true)
+  .order('order_num', { ascending: true });
 
-// Cargar precios editados
-let priceOverrides: Record<number, number> = {};
-try {
-  await db.run(sql`
-    CREATE TABLE IF NOT EXISTS price_overrides (
-      item_id INTEGER PRIMARY KEY,
-      price REAL NOT NULL,
-      updated_at INTEGER NOT NULL DEFAULT (unixepoch())
-    )
-  `);
-  const result = await db.all(sql`SELECT item_id, price FROM price_overrides`);
-  for (const row of result as any[]) {
-    priceOverrides[row.item_id] = row.price;
+// Obtener items disponibles
+const { data: items } = await supabase
+  .from('menu_items')
+  .select('*')
+  .eq('is_available', true)
+  .order('order_num', { ascending: true });
+
+// Agrupar items por categoría
+const itemsByCategory = new Map();
+for (const item of items || []) {
+  if (item.category_id) {
+    if (!itemsByCategory.has(item.category_id)) {
+      itemsByCategory.set(item.category_id, []);
+    }
+    itemsByCategory.get(item.category_id).push(item);
   }
-} catch (error) {
-  console.error('Error cargando precios:', error);
 }
 
-// Obtener categorías
-const allCategories = await db.select()
-  .from(categories)
-  .where(eq(categories.isActive, true))
-  .orderBy(asc(categories.order), asc(categories.name));
+// Filtrar categorías con items
+const categoriesForPrint = (categories || []).filter(cat => 
+  itemsByCategory.has(cat.id) && itemsByCategory.get(cat.id).length > 0
+).map(cat => ({
+  ...cat,
+  items: itemsByCategory.get(cat.id)
+}));
 
-// Crear mapa slug -> id
-const categorySlugToId = new Map<string, number>();
-const categoryIdToData = new Map<number, any>();
-for (const cat of allCategories) {
-  categorySlugToId.set(cat.slug, cat.id);
-  categoryIdToData.set(cat.id, cat);
-}
-
-// Procesar items estáticos
-const itemsByCategory = new Map<number, any[]>();
-
-for (const item of staticMenuItems) {
-  if (!item.isAvailable) continue;
-  
-  const categoryId = categorySlugToId.get(item.categorySlug);
-  if (!categoryId) continue;
-  
-  const finalPrice = priceOverrides[item.id] !== undefined 
-    ? priceOverrides[item.id] 
-    : item.price;
-  
-  if (!itemsByCategory.has(categoryId)) {
-    itemsByCategory.set(categoryId, []);
-  }
-  
-  itemsByCategory.get(categoryId)!.push({
-    ...item,
-    categoryId,
-    price: finalPrice,
-    category: categoryIdToData.get(categoryId),
-  });
-}
-
-// Ordenar items dentro de cada categoría
-for (const [categoryId, items] of itemsByCategory.entries()) {
-  items.sort((a, b) => {
-    if (a.order !== b.order) return a.order - b.order;
-    return a.name.localeCompare(b.name);
-  });
-}
-
-// Organizar categorías para impresión (todas las páginas necesarias)
-const categoriesForPrint = allCategories
-  .filter(cat => itemsByCategory.has(cat.id) && itemsByCategory.get(cat.id)!.length > 0)
-  .map(cat => ({
-    ...cat,
-    items: itemsByCategory.get(cat.id)!,
-  }));
-
-// Dividir en páginas de manera inteligente
-// Intentar mantener aproximadamente 2 páginas, pero permitir más si es necesario
-const itemsPerPage = 15; // Aproximadamente 15 items por página
+// Dividir en páginas (máximo ~12 items por página para mejor visualización)
+const itemsPerPage = 12;
 let totalItems = 0;
 for (const cat of categoriesForPrint) {
   totalItems += cat.items.length;
 }
 
+// Calcular número de páginas necesarias
 const estimatedPages = Math.max(2, Math.ceil(totalItems / itemsPerPage));
 const categoriesPerPage = Math.ceil(categoriesForPrint.length / estimatedPages);
 
@@ -99,6 +52,11 @@ for (let i = 0; i < categoriesForPrint.length; i += categoriesPerPage) {
   pages.push(categoriesForPrint.slice(i, i + categoriesPerPage));
 }
 
+// Si no hay páginas, crear al menos una vacía para mostrar mensaje
+if (pages.length === 0) {
+  pages.push([]);
+}
+
 const formatPrice = (price: number) => {
   if (price === 0) return 'Consultar';
   return new Intl.NumberFormat('es-CL', {
@@ -106,6 +64,13 @@ const formatPrice = (price: number) => {
     currency: 'CLP',
     minimumFractionDigits: 0,
   }).format(price);
+};
+
+// Función para detectar si un item contiene carne
+const hasMeat = (itemName: string, description: string = '') => {
+  const meatKeywords = ['carne', 'pollo', 'kebab', 'kebbab', 'mixto', 'vacuno', 'halal'];
+  const text = `${itemName} ${description}`.toLowerCase();
+  return meatKeywords.some(keyword => text.includes(keyword));
 };
 ---
 
@@ -117,17 +82,24 @@ const formatPrice = (price: number) => {
           <img src="/logo-cropped.png" alt="Gourmet Árabe" class="print-logo" />
           <h1 class="print-title">GOURMET ÁRABE</h1>
           <p class="print-subtitle">Sabores Auténticos del Medio Oriente</p>
+          <p class="print-halal">🕌 Carne Halal Certificada</p>
           <p class="print-phone">📱 +56 9 3945 9286</p>
         </div>
 
-        {pageCategories.map((category) => (
-          <div class="print-category">
-            <h2 class="print-category-title">{category.name.toUpperCase()}</h2>
-            <div class="print-items-grid">
-              {itemsByCategory.get(category.id)?.map((item) => (
+        {pageCategories.length > 0 ? (
+          pageCategories.map((category) => (
+            <div class="print-category">
+              <h2 class="print-category-title">{category.name.toUpperCase()}</h2>
+              <div class="print-items-grid">
+              {category.items?.map((item: any) => (
                 <div class="print-item">
                   <div class="print-item-content">
-                    <h3 class="print-item-name">{item.name}</h3>
+                    <div class="flex items-center gap-2 mb-1">
+                      <h3 class="print-item-name">{item.name}</h3>
+                      {hasMeat(item.name, item.description) && (
+                        <span class="print-halal-badge" title="Carne halal certificada">🕌</span>
+                      )}
+                    </div>
                     {item.description && (
                       <p class="print-item-description">{item.description}</p>
                     )}
@@ -137,9 +109,15 @@ const formatPrice = (price: number) => {
                   </div>
                 </div>
               ))}
+              </div>
             </div>
+          ))
+        ) : (
+          <div class="text-center py-12">
+            <p class="text-gold-400 text-xl">No hay items en el menú</p>
+            <p class="text-gold-300 mt-2">Agrega productos desde el panel de administración</p>
           </div>
-        ))}
+        )}
       </div>
     ))}
   </div>
@@ -167,8 +145,6 @@ const formatPrice = (price: number) => {
       background-attachment: fixed !important;
       margin: 0 !important;
       padding: 0 !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-container {
@@ -187,11 +163,8 @@ const formatPrice = (price: number) => {
       background-image: url('/fondo.png') !important;
       background-size: cover !important;
       background-position: center !important;
-      background-repeat: no-repeat !important;
       box-sizing: border-box;
       position: relative;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-page:last-child {
@@ -203,8 +176,6 @@ const formatPrice = (price: number) => {
       margin-bottom: 15px;
       padding-bottom: 12px;
       border-bottom: 3px solid #d4af37 !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-logo {
@@ -221,8 +192,6 @@ const formatPrice = (price: number) => {
       color: #d4af37 !important;
       margin: 8px 0 4px;
       text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-subtitle {
@@ -231,6 +200,14 @@ const formatPrice = (price: number) => {
       color: #d4af37 !important;
       margin: 0;
       font-style: italic;
+    }
+
+    .print-halal {
+      font-family: 'Playfair Display', serif;
+      font-size: 10px;
+      color: #d4af37 !important;
+      margin: 4px 0 0 0;
+      font-weight: 600;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -240,6 +217,13 @@ const formatPrice = (price: number) => {
       font-size: 11px;
       color: #d4af37 !important;
       margin: 4px 0 0 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    .print-halal-badge {
+      font-size: 10px;
+      color: #d4af37 !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
     }
@@ -258,8 +242,6 @@ const formatPrice = (price: number) => {
       padding: 6px 0;
       border-bottom: 2px solid #d4af37 !important;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-items-grid {
@@ -278,8 +260,6 @@ const formatPrice = (price: number) => {
       padding: 7px 9px;
       page-break-inside: avoid;
       min-height: 42px;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-item-content {
@@ -294,8 +274,6 @@ const formatPrice = (price: number) => {
       color: #d4af37 !important;
       margin: 0 0 2px 0;
       line-height: 1.2;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-item-description {
@@ -304,8 +282,6 @@ const formatPrice = (price: number) => {
       color: #f5e6d3 !important;
       margin: 0;
       line-height: 1.25;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-item-price-box {
@@ -319,9 +295,6 @@ const formatPrice = (price: number) => {
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
     .print-item-price {
@@ -331,11 +304,8 @@ const formatPrice = (price: number) => {
       color: #1a1a1a !important;
       text-align: center;
       line-height: 1.2;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
     }
 
-    /* Ocultar elementos no necesarios para impresión */
     header, footer, nav, .no-print, .print-button {
       display: none !important;
     }
@@ -366,7 +336,6 @@ const formatPrice = (price: number) => {
       background-image: url('/fondo.png');
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
     }
 
     .print-header {
@@ -400,11 +369,24 @@ const formatPrice = (price: number) => {
       font-style: italic;
     }
 
+    .print-halal {
+      font-family: 'Playfair Display', serif;
+      font-size: 12px;
+      color: #d4af37;
+      margin: 4px 0 0 0;
+      font-weight: 600;
+    }
+
     .print-phone {
       font-family: 'Playfair Display', serif;
       font-size: 13px;
       color: #d4af37;
       margin: 6px 0 0 0;
+    }
+
+    .print-halal-badge {
+      font-size: 12px;
+      color: #d4af37;
     }
 
     .print-category {
@@ -473,7 +455,6 @@ const formatPrice = (price: number) => {
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .print-item-price {
@@ -485,7 +466,6 @@ const formatPrice = (price: number) => {
       line-height: 1.2;
     }
 
-    /* Botón para imprimir en pantalla */
     .print-button {
       position: fixed;
       top: 20px;
@@ -521,5 +501,3 @@ const formatPrice = (price: number) => {
     }
   })();
 </script>
-
-

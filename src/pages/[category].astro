@@ -1,119 +1,243 @@
 ---
 import PublicLayout from '../layouts/PublicLayout.astro';
-import MenuSection from '../components/public/MenuSection';
-import ComboMenusSection from '../components/public/ComboMenusSection';
-import { initDatabase } from '../db/index';
-import { db } from '../db/index';
-import { categories, menuItems } from '../db/schema';
-import { eq, asc, inArray } from 'drizzle-orm';
+import HalalInfo from '../components/HalalInfo';
+import { supabase } from '../lib/supabase';
 
-await initDatabase();
+const { category: categorySlug } = Astro.params;
 
-// Obtener solo categorías que tienen items disponibles para la navegación
-let allCategories = [];
-try {
-  // Obtener IDs de categorías que tienen items disponibles
-  const categoriesWithItems = await db
-    .selectDistinct({ categoryId: menuItems.categoryId })
-    .from(menuItems)
-    .where(eq(menuItems.isAvailable, true));
-  
-  const categoryIds = categoriesWithItems
-    .map(c => c.categoryId)
-    .filter(id => id !== null) as number[];
-  
-  if (categoryIds.length > 0) {
-    allCategories = await db.select().from(categories)
-      .where(eq(categories.isActive, true))
-      .where(inArray(categories.id, categoryIds))
-      .orderBy(asc(categories.order), asc(categories.name));
-  } else {
-    allCategories = [];
-  }
-} catch (error) {
-  console.error('Error loading categories:', error);
-  allCategories = [];
+// Obtener la categoría por slug
+const { data: category } = await supabase
+  .from('categories')
+  .select('*')
+  .eq('slug', categorySlug)
+  .eq('is_active', true)
+  .single();
+
+if (!category) {
+  return Astro.redirect('/');
 }
 
-// Obtener la categoría actual desde el parámetro
-const categorySlug = Astro.params.category || 'entradas';
-const currentCategory = allCategories.find(cat => cat.slug === categorySlug) || allCategories[0];
+// Obtener items de esta categoría
+const { data: items } = await supabase
+  .from('menu_items')
+  .select('*')
+  .eq('category_id', category.id)
+  .eq('is_available', true)
+  .order('order_num', { ascending: true });
+
+// Obtener todas las categorías para navegación
+const { data: allCategories } = await supabase
+  .from('categories')
+  .select('*')
+  .eq('is_active', true)
+  .order('order_num', { ascending: true });
+
+const formatPrice = (price: number) => {
+  if (price === 0) return 'Consultar';
+  return '$' + new Intl.NumberFormat('es-CL').format(price);
+};
+
+// Función para detectar si un item contiene carne
+const hasMeat = (itemName: string, description: string = '') => {
+  const meatKeywords = ['carne', 'pollo', 'kebab', 'kebbab', 'mixto', 'vacuno', 'halal'];
+  const text = `${itemName} ${description}`.toLowerCase();
+  return meatKeywords.some(keyword => text.includes(keyword));
+};
 ---
 
-<PublicLayout title={`${currentCategory?.name || 'Menú'} - Gourmet Árabe`}>
-  <header class="sticky top-0 z-50 bg-black/70 backdrop-blur-sm border-b-4 border-gold-600 shadow-lg">
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <div class="flex items-center justify-center gap-4 mb-6">
-        <div class="w-24 h-24 md:w-28 md:h-28 animate-float">
-          <img 
-            src="/logo-cropped.png" 
-            alt="Gourmet Árabe Logo" 
-            class="w-full h-full object-contain rounded-full shadow-xl"
-            style="box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);"
-          />
+<PublicLayout title={`${category.name} - Gourmet Árabe`}>
+  <!-- Fondo con patrón árabe -->
+  <div class="min-h-screen bg-[#0a0a0a] relative">
+    <!-- Patrón árabe de fondo -->
+    <div class="absolute inset-0 opacity-10" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
+    
+    <div class="relative z-10">
+      <!-- Header con Logo -->
+      <header class="pt-6 pb-4 text-center">
+        <a href="/" class="inline-block">
+          <div class="relative mx-auto w-32 h-32 mb-2">
+            <img 
+              src="/logo-cropped.png" 
+              alt="Gourmet Árabe" 
+              class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]"
+            />
+          </div>
+          <h1 class="font-cinzel text-gold-500 text-2xl tracking-wider" style="text-shadow: 0 0 20px rgba(212,175,55,0.3);">
+            GOURMET ÁRABE
+          </h1>
+        </a>
+      </header>
+
+      <!-- Navegación de categorías -->
+      <nav class="px-4 pb-6">
+        <div class="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
+          {allCategories?.map((cat) => (
+            <a 
+              href={`/${cat.slug}`}
+              class={`
+                px-4 py-2 text-sm font-semibold tracking-wide transition-all duration-300
+                border-2 rounded
+                ${cat.slug === categorySlug
+                  ? 'bg-gradient-to-b from-gold-400 to-gold-600 text-black border-gold-300 shadow-[0_0_15px_rgba(212,175,55,0.4)]'
+                  : 'bg-transparent text-gold-400 border-gold-600/50 hover:border-gold-400 hover:bg-gold-600/10'
+                }
+              `}
+            >
+              {cat.name.toUpperCase()}
+            </a>
+          ))}
         </div>
-      </div>
-      
-      <nav class="flex flex-wrap justify-center gap-2">
-        {allCategories.map((category) => (
-          <a
-            href={`/${category.slug}`}
-            class={`px-4 py-2 font-semibold rounded transition border-2 ${
-              category.slug === categorySlug
-                ? 'bg-gold-600 text-black border-gold-400'
-                : 'bg-gray-800 text-gold-400 border-gold-600 hover:bg-gold-600 hover:text-black hover:border-gold-400'
-            }`}
-          >
-            {category.name}
-          </a>
-        ))}
       </nav>
-    </div>
-  </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8 min-h-screen">
-    {currentCategory ? (
-      currentCategory.slug === 'menus-combinados' ? (
-        <ComboMenusSection client:load />
-      ) : (
-        <div id={`menu-section-${currentCategory.slug}`}>
-          <MenuSection category={JSON.stringify(currentCategory)} client:only="react" />
+      <!-- Título de la sección con decoración árabe -->
+      <div class="px-4 mb-8">
+        <div class="max-w-xl mx-auto">
+          <div class="relative border-4 border-gold-500 rounded-lg p-4 bg-black/60 backdrop-blur-sm">
+            <!-- Esquinas decorativas -->
+            <div class="absolute -top-1 -left-1 w-4 h-4 border-t-4 border-l-4 border-gold-400"></div>
+            <div class="absolute -top-1 -right-1 w-4 h-4 border-t-4 border-r-4 border-gold-400"></div>
+            <div class="absolute -bottom-1 -left-1 w-4 h-4 border-b-4 border-l-4 border-gold-400"></div>
+            <div class="absolute -bottom-1 -right-1 w-4 h-4 border-b-4 border-r-4 border-gold-400"></div>
+            
+            <!-- Decoración interior -->
+            <div class="border-2 border-gold-600/50 rounded p-3">
+              <h2 class="text-center font-cinzel text-gold-400 text-2xl md:text-3xl tracking-widest">
+                <span class="text-gold-500">★</span>
+                <span class="mx-4">{category.name.toUpperCase()}</span>
+                <span class="text-gold-500">★</span>
+              </h2>
+            </div>
+          </div>
         </div>
-      )
-    ) : (
-      <div class="text-center py-12">
-        <p class="text-gold-400 text-xl mb-4">Categoría no encontrada</p>
-        <a href="/" class="text-gold-300 hover:text-gold-400 underline">Volver al inicio</a>
       </div>
-    )}
-  </main>
 
-  <footer class="bg-black/70 backdrop-blur-sm border-t-4 border-gold-600 mt-16 py-8">
-    <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
-        <p class="text-gold-400 font-playfair text-lg">
-          Gourmet Árabe - Sabores Auténticos del Medio Oriente
-        </p>
-        <p class="text-gold-300 font-playfair text-base">
-          📱 +56 9 3945 9286
-        </p>
-        <div class="pt-2 border-t border-gold-600/30 flex flex-col sm:flex-row justify-center items-center gap-4">
-          <a 
-            href="/print" 
-            class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors flex items-center gap-2"
-            title="Versión Imprimible del Menú"
-          >
-            🖨️ Menú Imprimible
-          </a>
-          <span class="text-gold-600/50 hidden sm:inline">|</span>
-          <a 
-            href="/admin/login" 
-            class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors"
-            title="Acceso Administrativo"
-          >
-            🔐 Acceso Admin
-          </a>
+      <!-- Grid de productos -->
+      <div class="px-4 pb-12">
+        <div class="max-w-6xl mx-auto">
+          {items && items.length > 0 ? (
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {items.map((item) => (
+                <div class="menu-card group">
+                  <!-- Borde decorativo árabe -->
+                  <div class="relative border-3 border-gold-500 rounded-lg overflow-hidden bg-black/70 backdrop-blur-sm transition-all duration-300 hover:border-gold-400 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                    
+                    {/* Imagen del producto */}
+                    {item.image_url && (
+                      <div class="relative h-48 overflow-hidden">
+                        <img 
+                          src={item.image_url} 
+                          alt={item.name}
+                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          loading="lazy"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        {item.is_featured && (
+                          <div class="absolute top-3 right-3 bg-gold-500 text-black px-2 py-1 rounded text-xs font-bold">
+                            ⭐ DESTACADO
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Contenido */}
+                    <div class="p-4">
+                      <div class="flex justify-between items-start gap-4">
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-cinzel text-gold-400 text-lg font-bold leading-tight">
+                              {item.name.toUpperCase()}
+                            </h3>
+                            {hasMeat(item.name, item.description) && (
+                              <span 
+                                class="inline-flex items-center gap-1 bg-gold-600/20 text-gold-400 px-2 py-0.5 rounded text-xs font-semibold border border-gold-600/50"
+                                title="Preparado con carne halal certificada"
+                              >
+                                🕌 HALAL
+                              </span>
+                            )}
+                            {!item.image_url && item.is_featured && (
+                              <span class="text-sm">⭐</span>
+                            )}
+                          </div>
+                          {item.description && (
+                            <p class="text-gold-200/70 text-sm leading-relaxed">{item.description}</p>
+                          )}
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                          <span class="font-cinzel text-gold-400 text-xl font-bold">
+                            {formatPrice(item.price)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Decoración de esquinas */}
+                    <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-gold-400/50 rounded-tl"></div>
+                    <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-gold-400/50 rounded-tr"></div>
+                    <div class="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-gold-400/50 rounded-bl"></div>
+                    <div class="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-gold-400/50 rounded-br"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="text-center py-16">
+              <div class="border-2 border-gold-600/50 rounded-lg p-8 bg-black/50 max-w-md mx-auto">
+                <p class="text-gold-400 text-xl mb-4">No hay items disponibles</p>
+                <a href="/" class="text-gold-300 hover:text-gold-400 underline">Volver al inicio</a>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="border-t-2 border-gold-600/30 bg-black/80 py-6">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+          <p class="text-gold-400 font-playfair mb-2">
+            Gourmet Árabe - Sabores Auténticos del Medio Oriente
+          </p>
+          <p class="text-gold-300/70 text-sm mb-4">
+            📱 +56 9 3945 9286
+          </p>
+          <div class="flex justify-center gap-6">
+            <a href="/" class="text-gold-400/70 hover:text-gold-400 text-sm transition">🏠 Inicio</a>
+            <a href="/print" class="text-gold-400/70 hover:text-gold-400 text-sm transition">🖨️ Imprimir</a>
+          </div>
+        </div>
+      </footer>
     </div>
-  </footer>
+  </div>
+
+  <!-- Componente flotante de información Halal -->
+  <HalalInfo client:load />
 </PublicLayout>
 
+<style>
+  .border-3 {
+    border-width: 3px;
+  }
+  
+  .menu-card {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+  }
+  
+  .menu-card:nth-child(1) { animation-delay: 0.1s; }
+  .menu-card:nth-child(2) { animation-delay: 0.15s; }
+  .menu-card:nth-child(3) { animation-delay: 0.2s; }
+  .menu-card:nth-child(4) { animation-delay: 0.25s; }
+  .menu-card:nth-child(5) { animation-delay: 0.3s; }
+  .menu-card:nth-child(6) { animation-delay: 0.35s; }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
