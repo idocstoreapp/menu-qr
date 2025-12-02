@@ -42,16 +42,15 @@ if (!supabaseUrl || !supabaseAnonKey) {
     'Configura PUBLIC_SUPABASE_URL y PUBLIC_SUPABASE_ANON_KEY en tu plataforma de deploy.';
   console.error(errorMsg);
   
-  // En producción, lanzar error para que sea visible
-  if (import.meta.env.PROD) {
-    throw new Error(errorMsg);
-  }
+  // NO lanzar error durante el build, solo mostrar warning
+  // El error se mostrará en runtime cuando se intente usar
 }
 
 // Crear cliente con validación
+// Usar placeholder solo si no hay configuración (para evitar errores en build)
 export const supabase = supabaseUrl && supabaseAnonKey 
   ? createClient(supabaseUrl, supabaseAnonKey)
-  : createClient('https://placeholder.supabase.co', 'placeholder-key'); // Placeholder para evitar errores en desarrollo
+  : createClient('https://placeholder.supabase.co', 'placeholder-key');
 
 // Helper para subir imágenes a Supabase Storage
 export async function uploadImage(file: File, bucket: string = 'menu-images'): Promise<string | null> {

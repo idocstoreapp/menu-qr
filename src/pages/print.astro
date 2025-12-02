@@ -2,19 +2,40 @@
 import PublicLayout from '../layouts/PublicLayout.astro';
 import { supabase } from '../lib/supabase';
 
-// Obtener categorías activas
-const { data: categories } = await supabase
-  .from('categories')
-  .select('*')
-  .eq('is_active', true)
-  .order('order_num', { ascending: true });
+// Verificar configuración
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL;
+const isConfigured = !!(supabaseUrl && supabaseUrl !== 'https://placeholder.supabase.co');
 
-// Obtener items disponibles
-const { data: items } = await supabase
-  .from('menu_items')
-  .select('*')
-  .eq('is_available', true)
-  .order('order_num', { ascending: true });
+let categories: any[] = [];
+let items: any[] = [];
+
+if (isConfigured) {
+  try {
+    // Obtener categorías activas
+    const { data: cats, error: catsError } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('order_num', { ascending: true });
+
+    if (!catsError && cats) {
+      categories = cats;
+    }
+
+    // Obtener items disponibles
+    const { data: itemsData, error: itemsError } = await supabase
+      .from('menu_items')
+      .select('*')
+      .eq('is_available', true)
+      .order('order_num', { ascending: true });
+
+    if (!itemsError && itemsData) {
+      items = itemsData;
+    }
+  } catch (error: any) {
+    console.error('Error cargando datos para impresión:', error?.message || error);
+  }
+}
 
 // Agrupar items por categoría
 const itemsByCategory = new Map();

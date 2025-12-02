@@ -12,7 +12,7 @@ const isConfigured = !!(supabaseUrl && supabaseKey);
 let activeCategories: any[] = [];
 let featuredItems: any[] = [];
 
-if (isConfigured) {
+if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
   try {
     const { data: allItems, error: itemsError } = await supabase
       .from('menu_items')
@@ -21,7 +21,7 @@ if (isConfigured) {
 
     if (itemsError) {
       console.error('Error obteniendo items:', itemsError);
-    } else {
+    } else if (allItems) {
       const categoryIdsWithItems = [...new Set((allItems || []).map(item => item.category_id).filter(Boolean))];
 
       if (categoryIdsWithItems.length > 0) {
@@ -32,23 +32,26 @@ if (isConfigured) {
           .in('id', categoryIdsWithItems)
           .order('order_num', { ascending: true });
 
-        if (!catsError) {
+        if (!catsError && cats) {
           activeCategories = cats || [];
         }
       }
 
       // Obtener items destacados
-      const { data: featured } = await supabase
+      const { data: featured, error: featuredError } = await supabase
         .from('menu_items')
         .select('*, category:categories(name, slug)')
         .eq('is_available', true)
         .eq('is_featured', true)
         .limit(4);
 
-      featuredItems = featured || [];
+      if (!featuredError && featured) {
+        featuredItems = featured || [];
+      }
     }
-  } catch (error) {
-    console.error('Error conectando con Supabase:', error);
+  } catch (error: any) {
+    // No fallar el build si hay error, solo loguear
+    console.error('Error conectando con Supabase:', error?.message || error);
   }
 }
 ---

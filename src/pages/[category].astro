@@ -5,32 +5,60 @@ import { supabase } from '../lib/supabase';
 
 const { category: categorySlug } = Astro.params;
 
-// Obtener la categoría por slug
-const { data: category } = await supabase
-  .from('categories')
-  .select('*')
-  .eq('slug', categorySlug)
-  .eq('is_active', true)
-  .single();
+// Verificar configuración
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPABASE_URL;
+const isConfigured = !!(supabaseUrl && supabaseUrl !== 'https://placeholder.supabase.co');
 
-if (!category) {
+let category: any = null;
+let items: any[] = [];
+let allCategories: any[] = [];
+
+if (isConfigured) {
+  try {
+    // Obtener la categoría por slug
+    const { data: cat, error: catError } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('slug', categorySlug)
+      .eq('is_active', true)
+      .single();
+
+    if (catError || !cat) {
+      return Astro.redirect('/');
+    }
+
+    category = cat;
+
+    // Obtener items de esta categoría
+    const { data: itemsData, error: itemsError } = await supabase
+      .from('menu_items')
+      .select('*')
+      .eq('category_id', category.id)
+      .eq('is_available', true)
+      .order('order_num', { ascending: true });
+
+    if (!itemsError && itemsData) {
+      items = itemsData;
+    }
+
+    // Obtener todas las categorías para navegación
+    const { data: cats, error: catsError } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('order_num', { ascending: true });
+
+    if (!catsError && cats) {
+      allCategories = cats;
+    }
+  } catch (error: any) {
+    console.error('Error cargando datos:', error?.message || error);
+    return Astro.redirect('/');
+  }
+} else {
+  // Si no está configurado, redirigir al inicio
   return Astro.redirect('/');
 }
-
-// Obtener items de esta categoría
-const { data: items } = await supabase
-  .from('menu_items')
-  .select('*')
-  .eq('category_id', category.id)
-  .eq('is_available', true)
-  .order('order_num', { ascending: true });
-
-// Obtener todas las categorías para navegación
-const { data: allCategories } = await supabase
-  .from('categories')
-  .select('*')
-  .eq('is_active', true)
-  .order('order_num', { ascending: true });
 
 const formatPrice = (price: number) => {
   if (price === 0) return 'Consultar';
