@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { jsonResponse } from '../lib/api-helpers';
+import { jsonResponse } from '../../lib/api-helpers';
 
 // Endpoint para verificar configuración en producción
 export const GET: APIRoute = async () => {
