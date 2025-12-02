@@ -38,10 +38,20 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || import.meta.env.SUPAB
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Variables de entorno de Supabase no configuradas');
+  const errorMsg = '⚠️ ERROR: Variables de entorno de Supabase no configuradas. ' +
+    'Configura PUBLIC_SUPABASE_URL y PUBLIC_SUPABASE_ANON_KEY en tu plataforma de deploy.';
+  console.error(errorMsg);
+  
+  // En producción, lanzar error para que sea visible
+  if (import.meta.env.PROD) {
+    throw new Error(errorMsg);
+  }
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Crear cliente con validación
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : createClient('https://placeholder.supabase.co', 'placeholder-key'); // Placeholder para evitar errores en desarrollo
 
 // Helper para subir imágenes a Supabase Storage
 export async function uploadImage(file: File, bucket: string = 'menu-images'): Promise<string | null> {

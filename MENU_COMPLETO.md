@@ -77,7 +77,7 @@
 | Tabla Mixta - Carne | Variedad de carnes árabes para compartir | $18.000 |
 | Tabla Mixta - Vegana | Variedad de opciones veganas para compartir | $16.000 |
 | Musaka | Tradicional musaka árabe | $9.500 |
-| Papas Fritas (Individual) | Porción individual de papas fritas | $3.500 |
+| fritas | $3.500 |
 | Papas Fritas (Para Compartir) | Porción grande de papas fritas para compartir | $5.500 |
 | Especial del Día | Consultar el especial del día | Consultar |
 | Postre del Día | Consultar el postre del día | Consultar |
