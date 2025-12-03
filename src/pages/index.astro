@@ -24,66 +24,63 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
 
     if (itemsError) {
       console.error('Error obteniendo items:', itemsError);
-    } else if (allItems) {
-      const categoryIdsWithItems = [...new Set((allItems || []).map(item => item.category_id).filter(Boolean))];
-
-      if (categoryIdsWithItems.length > 0) {
-        const { data: cats, error: catsError } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('is_active', true)
-          .in('id', categoryIdsWithItems)
-          .order('order_num', { ascending: true });
-
-        if (!catsError && cats) {
-          activeCategories = cats || [];
-        }
-      }
-
-      // Obtener items destacados
-      const { data: featured, error: featuredError } = await supabase
-        .from('menu_items')
-        .select('*, category:categories(name, slug)')
-        .eq('is_available', true)
-        .eq('is_featured', true)
-        .limit(4);
-
-      if (!featuredError && featured) {
-        featuredItems = featured || [];
-      }
-
-      // Obtener imágenes destacadas de diferentes categorías para el hero slider
-      // Una imagen destacada por cada categoría principal (máximo 5)
-      const mainCategorySlugs = ['entradas', 'shawarma', 'platillos', 'promociones', 'menu-del-dia'];
-      const heroImagesSet = new Set<string>();
-
-      for (const slug of mainCategorySlugs) {
-        const { data: category } = await supabase
-          .from('categories')
-          .select('id')
-          .eq('slug', slug)
-          .eq('is_active', true)
-          .single();
-
-        if (category) {
-          // Obtener un item con imagen de esta categoría (preferir destacados)
-          const { data: items } = await supabase
-            .from('menu_items')
-            .select('image_url')
-            .eq('category_id', category.id)
-            .eq('is_available', true)
-            .not('image_url', 'is', null)
-            .order('is_featured', { ascending: false })
-            .limit(1);
-
-          if (items && items[0]?.image_url) {
-            heroImagesSet.add(items[0].image_url);
-          }
-        }
-      }
-
-      heroImages = Array.from(heroImagesSet).slice(0, 5);
     }
+    
+    // Obtener TODAS las categorías activas (no solo las que tienen items)
+    // Esto permite mostrar categorías nuevas aunque aún no tengan items
+    const { data: cats, error: catsError } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('is_active', true)
+      .order('order_num', { ascending: true });
+
+    if (!catsError && cats) {
+      activeCategories = cats || [];
+    }
+    
+    // Obtener items destacados
+    const { data: featured, error: featuredError } = await supabase
+      .from('menu_items')
+      .select('*, category:categories(name, slug)')
+      .eq('is_available', true)
+      .eq('is_featured', true)
+      .limit(4);
+
+    if (!featuredError && featured) {
+      featuredItems = featured || [];
+    }
+
+    // Obtener imágenes destacadas de diferentes categorías para el hero slider
+    // Una imagen destacada por cada categoría principal (máximo 5)
+    const mainCategorySlugs = ['entradas', 'shawarma', 'platillos', 'promociones', 'menu-del-dia'];
+    const heroImagesSet = new Set<string>();
+
+    for (const slug of mainCategorySlugs) {
+      const { data: category } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', slug)
+        .eq('is_active', true)
+        .single();
+
+      if (category) {
+        // Obtener un item con imagen de esta categoría (preferir destacados)
+        const { data: items } = await supabase
+          .from('menu_items')
+          .select('image_url')
+          .eq('category_id', category.id)
+          .eq('is_available', true)
+          .not('image_url', 'is', null)
+          .order('is_featured', { ascending: false })
+          .limit(1);
+
+        if (items && items[0]?.image_url) {
+          heroImagesSet.add(items[0].image_url);
+        }
+      }
+    }
+
+    heroImages = Array.from(heroImagesSet).slice(0, 5);
   } catch (error: any) {
     // No fallar el build si hay error, solo loguear
     console.error('Error conectando con Supabase:', error?.message || error);
@@ -102,8 +99,8 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
   
   <!-- Fondo con patrón árabe -->
   <div class="min-h-screen bg-[#0a0a0a] relative">
-    <!-- Patrón árabe de fondo (solo desktop) -->
-    <div class="hidden md:block absolute inset-0 opacity-10 z-0" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
+    <!-- Patrón árabe de fondo (siempre visible, detrás del slider en móvil) -->
+    <div class="absolute inset-0 opacity-10 z-0" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
     
     <div class="relative z-10 flex flex-col min-h-screen">
       <!-- Header con Logo Grande -->

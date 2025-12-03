@@ -46,7 +46,32 @@ if (isConfigured) {
       // Obtener imágenes destacadas de esta categoría para el hero slider
       // Preferir items destacados, máximo 5 imágenes
       const itemsWithImages = itemsData
-        .filter((item: any) => item.image_url)
+        .filter((item: any) => {
+          // Filtrar items con imagen
+          if (!item.image_url) return false;
+          
+          const imageUrl = item.image_url.toLowerCase();
+          const itemName = item.name.toLowerCase();
+          
+          // Para acompañamientos, excluir salsa-ajo del slider
+          if (categorySlug === 'acompanamiento-salsas') {
+            if (imageUrl.includes('salsa-ajo') || itemName.includes('salsa de ajo')) {
+              return false;
+            }
+          }
+          
+          // Para menú del día, excluir pollo-plancha y pollo-aceituna del slider
+          if (categorySlug === 'menu-del-dia') {
+            if (imageUrl.includes('pollo-plancha') || itemName.includes('pollo a la plancha')) {
+              return false;
+            }
+            if (imageUrl.includes('pollo-aceituna') || itemName.includes('pollo a la aceituna')) {
+              return false;
+            }
+          }
+          
+          return true;
+        })
         .sort((a: any, b: any) => {
           // Priorizar items destacados
           if (a.is_featured && !b.is_featured) return -1;
@@ -102,8 +127,8 @@ const hasMeat = (itemName: string, description: string = '') => {
   
   <!-- Fondo con patrón árabe -->
   <div class="min-h-screen bg-[#0a0a0a] relative">
-    <!-- Patrón árabe de fondo (solo desktop) -->
-    <div class="hidden md:block absolute inset-0 opacity-10 z-0" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
+    <!-- Patrón árabe de fondo (siempre visible, detrás del slider en móvil) -->
+    <div class="absolute inset-0 opacity-10 z-0" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
     
     <div class="relative z-10">
       <!-- Header con Logo -->
