@@ -2,6 +2,7 @@
 import PublicLayout from '../layouts/PublicLayout.astro';
 import HalalInfo from '../components/HalalInfo';
 import NavigationMenu from '../components/NavigationMenu';
+import HeroSlider from '../components/HeroSlider';
 import { supabase } from '../lib/supabase';
 
 const { category: categorySlug } = Astro.params;
@@ -13,6 +14,7 @@ const isConfigured = !!(supabaseUrl && supabaseUrl !== 'https://placeholder.supa
 let category: any = null;
 let items: any[] = [];
 let allCategories: any[] = [];
+let heroImages: string[] = [];
 
 if (isConfigured) {
   try {
@@ -40,6 +42,21 @@ if (isConfigured) {
 
     if (!itemsError && itemsData) {
       items = itemsData;
+      
+      // Obtener imágenes destacadas de esta categoría para el hero slider
+      // Preferir items destacados, máximo 5 imágenes
+      const itemsWithImages = itemsData
+        .filter((item: any) => item.image_url)
+        .sort((a: any, b: any) => {
+          // Priorizar items destacados
+          if (a.is_featured && !b.is_featured) return -1;
+          if (!a.is_featured && b.is_featured) return 1;
+          return 0;
+        })
+        .slice(0, 5)
+        .map((item: any) => item.image_url);
+      
+      heroImages = itemsWithImages;
     }
 
     // Obtener todas las categorías para navegación
@@ -78,14 +95,19 @@ const hasMeat = (itemName: string, description: string = '') => {
   <!-- Menú de navegación sticky -->
   <NavigationMenu client:load categories={allCategories} currentSlug={categorySlug} />
   
+  <!-- Hero Slider (solo móvil, fondo) -->
+  {heroImages.length > 0 && (
+    <HeroSlider client:load images={heroImages} />
+  )}
+  
   <!-- Fondo con patrón árabe -->
   <div class="min-h-screen bg-[#0a0a0a] relative">
-    <!-- Patrón árabe de fondo -->
-    <div class="absolute inset-0 opacity-10" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
+    <!-- Patrón árabe de fondo (solo desktop) -->
+    <div class="hidden md:block absolute inset-0 opacity-10 z-0" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
     
     <div class="relative z-10">
       <!-- Header con Logo -->
-      <header class="pt-6 pb-4 text-center">
+      <header class="pt-6 pb-4 text-center relative z-30">
         <a href="/" class="inline-block">
           <div class="relative mx-auto w-48 h-48 md:w-64 md:h-64 mb-2">
             <img 
@@ -101,7 +123,7 @@ const hasMeat = (itemName: string, description: string = '') => {
       </header>
 
       <!-- Navegación de categorías -->
-      <nav class="px-4 pb-6">
+      <nav class="px-4 pb-6 relative z-30">
         <div class="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
           {allCategories?.map((cat) => (
             <a 
@@ -122,7 +144,7 @@ const hasMeat = (itemName: string, description: string = '') => {
       </nav>
 
       <!-- Título de la sección con decoración árabe -->
-      <div class="px-4 mb-8">
+      <div class="px-4 mb-8 relative z-20">
         <div class="max-w-xl mx-auto">
           <div class="relative border-4 border-gold-500 rounded-lg p-4 bg-black/60 backdrop-blur-sm">
             <!-- Esquinas decorativas -->

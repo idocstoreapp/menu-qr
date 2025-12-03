@@ -2,6 +2,7 @@
 import PublicLayout from '../layouts/PublicLayout.astro';
 import HalalInfo from '../components/HalalInfo';
 import NavigationMenu from '../components/NavigationMenu';
+import HeroSlider from '../components/HeroSlider';
 import { supabase } from '../lib/supabase';
 
 // Verificar configuración de Supabase
@@ -12,6 +13,7 @@ const isConfigured = !!(supabaseUrl && supabaseKey);
 // Obtener categorías activas que tienen items disponibles
 let activeCategories: any[] = [];
 let featuredItems: any[] = [];
+let heroImages: string[] = [];
 
 if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
   try {
@@ -49,6 +51,38 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
       if (!featuredError && featured) {
         featuredItems = featured || [];
       }
+
+      // Obtener imágenes destacadas de diferentes categorías para el hero slider
+      // Una imagen destacada por cada categoría principal (máximo 5)
+      const mainCategorySlugs = ['entradas', 'shawarma', 'platillos', 'promociones', 'menu-del-dia'];
+      const heroImagesSet = new Set<string>();
+
+      for (const slug of mainCategorySlugs) {
+        const { data: category } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('slug', slug)
+          .eq('is_active', true)
+          .single();
+
+        if (category) {
+          // Obtener un item con imagen de esta categoría (preferir destacados)
+          const { data: items } = await supabase
+            .from('menu_items')
+            .select('image_url')
+            .eq('category_id', category.id)
+            .eq('is_available', true)
+            .not('image_url', 'is', null)
+            .order('is_featured', { ascending: false })
+            .limit(1);
+
+          if (items && items[0]?.image_url) {
+            heroImagesSet.add(items[0].image_url);
+          }
+        }
+      }
+
+      heroImages = Array.from(heroImagesSet).slice(0, 5);
     }
   } catch (error: any) {
     // No fallar el build si hay error, solo loguear
@@ -61,15 +95,20 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
   <!-- Menú de navegación sticky -->
   <NavigationMenu client:load categories={activeCategories} />
   
+  <!-- Hero Slider (solo móvil, fondo) -->
+  {heroImages.length > 0 && (
+    <HeroSlider client:load images={heroImages} />
+  )}
+  
   <!-- Fondo con patrón árabe -->
   <div class="min-h-screen bg-[#0a0a0a] relative">
-    <!-- Patrón árabe de fondo -->
-    <div class="absolute inset-0 opacity-10" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
+    <!-- Patrón árabe de fondo (solo desktop) -->
+    <div class="hidden md:block absolute inset-0 opacity-10 z-0" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
     
     <div class="relative z-10 flex flex-col min-h-screen">
       <!-- Header con Logo Grande -->
-      <header class="flex-grow flex flex-col items-center justify-center py-12 px-4">
-        <div class="text-center animate-fade-in">
+      <header class="flex-grow flex flex-col items-center justify-center py-12 px-4 relative z-30 min-h-screen md:min-h-0">
+        <div class="text-center animate-fade-in relative z-10">
           <!-- Logo -->
           <div class="relative mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-96 lg:h-96 mb-6">
             <div class="absolute inset-0 bg-gold-500/20 rounded-full blur-3xl animate-pulse"></div>
