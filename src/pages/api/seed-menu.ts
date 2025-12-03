@@ -63,6 +63,8 @@ function getImageUrl(itemName: string, categorySlug: string): string | null {
       'pollo-a-la-ciruela': '/menu-del.dia/pollo-ciruleas.png',
       'pollo-arvejado': '/menu-del.dia/pollo-arvejado.png',
       'pollo-guisado-con-verduras': '/menu-del.dia/pollo-verduras.png',
+      'pollo-al-coniac': '/menu-del.dia/pollo-coniac.png',
+      'pollo-estofado': '/menu-del.dia/pollo-estofado.png',
       'tomatican-de-pollo': '/menu-del.dia/tomatican-pollo.png',
       'guisado-de-3-lentejas': '/menu-del.dia/guisado-3lentejas.png',
       'guisado-de-garbanzos': '/menu-del.dia/guisado-garbanzos.png',
@@ -78,7 +80,11 @@ function getImageUrl(itemName: string, categorySlug: string): string | null {
     'acompanamiento-salsas': {
       'salsa-de-ajo': '/acompañamientos/salsa-ajo.png',
       'salsa-de-cilantro': '/acompañamientos/salsa-cilantro.png',
-      'salsa-de-albahaca': '/acompañamientos/salsa-albaca.png',
+      'salsa-de-albahaca': '/acompañamientos/salsa-albahaca.png',
+      'pimenton': '/acompañamientos/salsa-pimenton.png',
+      'albahaca': '/acompañamientos/salsa-albahaca.png',
+      'yogurt': '/acompañamientos/salsa-yogurt.png',
+      'aji-de-oro': '/acompañamientos/salsa-aji-oro.png',
     },
     'bebestibles': {
       'tetera-de-te-verde': '/bebestibles/te-verde.png',
@@ -89,7 +95,14 @@ function getImageUrl(itemName: string, categorySlug: string): string | null {
       'bebidas-lata-variedad': '/bebestibles/bebidas-lata.png',
       'agua-mineral-con-gas': '/bebestibles/bebida-agua-gas.png',
       'agua-mineral-sin-gas': '/bebestibles/bebida-agua-sin-gas.png',
-      'jugos-naturales-variedad': '/bebestibles/bebidas-lata.png',
+      'jugos-naturales-variedad': '/bebestibles/jugos-temporada.png',
+      'jugos-natural': '/bebestibles/jugos-temporada.png',
+      'limonada': '/bebestibles/jugos-temporada.png',
+      'jugos-watt': '/bebestibles/jugos-watts.png',
+    },
+    'postres': {
+      'ceregli': '/postres/postre-ceregli.png',
+      'postre-surtido': '/postres/postre-surtido.png',
     },
   };
 
@@ -116,6 +129,7 @@ const categories = [
   { name: 'Menú Fin de Año', slug: 'menu-fin-de-ano', order_num: 6, description: '🎄 Menús especiales para compartir' },
   { name: 'Acompañamiento - Salsas', slug: 'acompanamiento-salsas', order_num: 7, description: 'Salsas caseras' },
   { name: 'Bebestibles', slug: 'bebestibles', order_num: 8, description: 'Bebidas y tés' },
+  { name: 'Postres', slug: 'postres', order_num: 9, description: 'Dulces árabes tradicionales' },
 ];
 
 // Items del menú COMPLETO con imágenes
@@ -173,11 +187,13 @@ const menuItems = [
   { name: 'Pollo a la Ciruela', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 3, imageUrl: '/menu-del.dia/pollo-ciruleas.png' },
   { name: 'Pollo Arvejado', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 4, imageUrl: '/menu-del.dia/pollo-arvejado.png' },
   { name: 'Pollo Guisado con Verduras', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 5, imageUrl: '/menu-del.dia/pollo-verduras.png' },
-  { name: 'Tomaticán de Pollo', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 6, imageUrl: '/menu-del.dia/tomatican-pollo.png' },
-  { name: 'Guisado de 3 Lentejas', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 7, imageUrl: '/menu-del.dia/guisado-3lentejas.png' },
-  { name: 'Guisado de Garbanzos', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 8, imageUrl: '/menu-del.dia/guisado-garbanzos.png' },
-  { name: 'Guisado de Berenjena', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 9, imageUrl: '/menu-del.dia/guisado-berenjena.png' },
-  { name: 'Consomé Individual', description: 'Consomé árabe tradicional por separado', price: 2000, categorySlug: 'menu-del-dia', order_num: 10, imageUrl: '/menu-del.dia/consome-arabe.png' },
+  { name: 'Pollo al Coñac', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 6, imageUrl: '/menu-del.dia/pollo-coniac.png' },
+  { name: 'Pollo Estofado', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 7, imageUrl: '/menu-del.dia/pollo-estofado.png' },
+  { name: 'Tomaticán de Pollo', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 8, imageUrl: '/menu-del.dia/tomatican-pollo.png' },
+  { name: 'Guisado de 3 Lentejas', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 9, imageUrl: '/menu-del.dia/guisado-3lentejas.png' },
+  { name: 'Guisado de Garbanzos', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 10, imageUrl: '/menu-del.dia/guisado-garbanzos.png' },
+  { name: 'Guisado de Berenjena', description: 'Con consomé, arroz árabe o cuscús o papas fritas o papas rústicas, postre y té árabe', price: 6900, categorySlug: 'menu-del-dia', order_num: 11, imageUrl: '/menu-del.dia/guisado-berenjena.png' },
+  { name: 'Consomé Individual', description: 'Consomé árabe tradicional por separado', price: 2000, categorySlug: 'menu-del-dia', order_num: 12, imageUrl: '/menu-del.dia/consome-arabe.png' },
 
   // ==================== MENÚ FIN DE AÑO 🎄 ====================
   { 
@@ -220,7 +236,11 @@ const menuItems = [
   // ==================== SALSAS ====================
   { name: 'Salsa de Ajo', description: 'Salsa cremosa de ajo', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 1, imageUrl: '/acompañamientos/salsa-ajo.png' },
   { name: 'Salsa de Cilantro', description: 'Salsa fresca de cilantro', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 2, imageUrl: '/acompañamientos/salsa-cilantro.png' },
-  { name: 'Salsa de Albahaca', description: 'Salsa aromática de albahaca', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 3, imageUrl: '/acompañamientos/salsa-albaca.png' },
+  { name: 'Salsa de Albahaca', description: 'Salsa aromática de albahaca', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 3, imageUrl: '/acompañamientos/salsa-albahaca.png' },
+  { name: 'Pimentón', description: 'Salsa de pimentón', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 4, imageUrl: '/acompañamientos/salsa-pimenton.png' },
+  { name: 'Albahaca', description: 'Salsa de albahaca', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 5, imageUrl: '/acompañamientos/salsa-albahaca.png' },
+  { name: 'Yogurt', description: 'Salsa de yogurt', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 6, imageUrl: '/acompañamientos/salsa-yogurt.png' },
+  { name: 'Ají de Oro', description: 'Salsa de ají de oro', price: 1500, categorySlug: 'acompanamiento-salsas', order_num: 7, imageUrl: '/acompañamientos/salsa-aji-oro.png' },
 
   // ==================== BEBESTIBLES ====================
   { name: 'Tetera de Té Verde', description: 'Té verde aromático servido en tetera tradicional', price: 3000, categorySlug: 'bebestibles', order_num: 1, imageUrl: '/bebestibles/te-verde.png' },
@@ -231,7 +251,15 @@ const menuItems = [
   { name: 'Bebidas Lata (Variedad)', description: 'Variedad de bebidas en lata', price: 1500, categorySlug: 'bebestibles', order_num: 6, imageUrl: '/bebestibles/bebidas-lata.png' },
   { name: 'Agua Mineral con Gas', description: 'Agua mineral con gas', price: 1500, categorySlug: 'bebestibles', order_num: 7, imageUrl: '/bebestibles/bebida-agua-gas.png' },
   { name: 'Agua Mineral sin Gas', description: 'Agua mineral sin gas', price: 1500, categorySlug: 'bebestibles', order_num: 8, imageUrl: '/bebestibles/bebida-agua-sin-gas.png' },
-  { name: 'Jugos Naturales (Variedad)', description: 'Jugos naturales frescos en variedad de sabores', price: 2500, categorySlug: 'bebestibles', order_num: 9, imageUrl: '/bebestibles/bebidas-lata.png' },
+  { name: 'Jugos Naturales (Fruta de la temporada)', description: 'Jugos naturales frescos de fruta de la temporada', price: 2500, categorySlug: 'bebestibles', order_num: 9, imageUrl: '/bebestibles/jugos-temporada.png' },
+  { name: 'Limonada (Menta, Jengibre y otras)', description: 'Limonada refrescante con menta, jengibre y otras hierbas', price: 2500, categorySlug: 'bebestibles', order_num: 10, imageUrl: '/bebestibles/jugos-temporada.png' },
+  { name: 'Jugos Watt SIN AZUCAR (Papayas, Naranja Valenciana y otros)', description: 'Jugos Watt naturales sin azúcar añadida. Sabores: Papayas, Naranja Valenciana y otros', price: 2500, categorySlug: 'bebestibles', order_num: 11, imageUrl: '/bebestibles/jugos-watts.png' },
+
+  // ==================== POSTRES ====================
+  { name: 'Ceregli - Caja 4 unid.', description: 'Dulces árabes tradicionales. Caja con 4 unidades', price: 12000, categorySlug: 'postres', order_num: 1, imageUrl: '/postres/postre-ceregli.png' },
+  { name: 'Ceregli - 1 unidad', description: 'Dulce árabe tradicional. 1 unidad', price: 3500, categorySlug: 'postres', order_num: 2, imageUrl: '/postres/postre-ceregli.png' },
+  { name: 'Postre Surtido - Caja 10 unid.', description: 'Variedad de dulces árabes. Caja con 10 unidades', price: 12000, categorySlug: 'postres', order_num: 3, imageUrl: '/postres/postre-surtido.png' },
+  { name: 'Postre Surtido - 1 unidad', description: 'Dulce árabe surtido. 1 unidad', price: 1500, categorySlug: 'postres', order_num: 4, imageUrl: '/postres/postre-surtido.png' },
 ];
 
 export const GET: APIRoute = async () => {

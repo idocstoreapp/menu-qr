@@ -148,3 +148,5 @@ Antes de hacer deploy, asegúrate de:
 
 **¿Necesitas ayuda?** Revisa los logs de tu plataforma de deploy o los logs en Supabase Dashboard > Logs.
 
+
+

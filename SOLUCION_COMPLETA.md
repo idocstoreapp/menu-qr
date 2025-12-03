@@ -132,3 +132,5 @@ Posibles causas:
 2. Los errores de la consola del navegador (F12)
 3. Los logs de Vercel (Function Logs)
 
+
+

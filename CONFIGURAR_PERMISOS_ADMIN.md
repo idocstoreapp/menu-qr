@@ -147,3 +147,5 @@ ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
 
 **¿Necesitas ayuda?** Revisa los logs en Supabase Dashboard > Logs para ver errores específicos.
 
+
+

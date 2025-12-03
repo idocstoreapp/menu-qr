@@ -135,3 +135,5 @@ WHERE tablename IN ('admin_users', 'categories', 'menu_items')
 -- - Restringe las políticas de Storage a usuarios autenticados
 -- - Usa Supabase Auth en lugar de JWT personalizado
 
+
+

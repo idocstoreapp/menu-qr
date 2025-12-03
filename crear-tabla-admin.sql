@@ -13,3 +13,5 @@ CREATE TABLE IF NOT EXISTS admin_users (
 -- Verificar que se creó correctamente
 SELECT * FROM admin_users;
 
+
+

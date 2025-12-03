@@ -113,3 +113,5 @@ CREATE TABLE IF NOT EXISTS admin_users (
 
 **¿Sigue sin funcionar?** Comparte el resultado de `/api/check-config` después de corregir las variables.
 
+
+

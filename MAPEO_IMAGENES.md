@@ -106,3 +106,5 @@
 - Las imágenes se cargan con `lazy loading` para mejor rendimiento
 - Si una imagen no existe, simplemente no se mostrará (no rompe la página)
 
+
+

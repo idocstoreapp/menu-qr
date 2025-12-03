@@ -104,3 +104,5 @@ En Vercel:
 
 **¿Sigue fallando?** Comparte el error completo de los logs de Vercel.
 
+
+
