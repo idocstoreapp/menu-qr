@@ -4,14 +4,46 @@
 -- Ejecutar este script COMPLETO en Supabase SQL Editor
 
 -- =====================================================
+-- 0. CREAR EL BUCKET (si no existe)
+-- =====================================================
+
+-- Crear el bucket menu-images como público
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'menu-images',
+  'menu-images',
+  true,
+  52428800, -- 50MB
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+)
+ON CONFLICT (id) DO UPDATE 
+SET public = true, 
+    file_size_limit = 52428800,
+    allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+-- =====================================================
 -- 1. CONFIGURAR POLÍTICAS DE STORAGE
 -- =====================================================
 
--- Eliminar políticas existentes si hay conflictos (opcional)
-DROP POLICY IF EXISTS "Public can read images" ON storage.objects;
-DROP POLICY IF EXISTS "Public can upload images" ON storage.objects;
-DROP POLICY IF EXISTS "Public can update images" ON storage.objects;
-DROP POLICY IF EXISTS "Public can delete images" ON storage.objects;
+-- IMPORTANTE: Eliminar políticas existentes PRIMERO
+-- Esto evita el error "policy already exists"
+
+DO $$ 
+BEGIN
+    -- Eliminar políticas existentes si existen
+    DROP POLICY IF EXISTS "Public can read images" ON storage.objects;
+    DROP POLICY IF EXISTS "Public can upload images" ON storage.objects;
+    DROP POLICY IF EXISTS "Public can update images" ON storage.objects;
+    DROP POLICY IF EXISTS "Public can delete images" ON storage.objects;
+    
+    -- También eliminar otras posibles variaciones
+    DROP POLICY IF EXISTS "Permitir lectura publica" ON storage.objects;
+    DROP POLICY IF EXISTS "Permitir subida" ON storage.objects;
+    DROP POLICY IF EXISTS "Permitir eliminacion" ON storage.objects;
+    DROP POLICY IF EXISTS "Allow public reads" ON storage.objects;
+    DROP POLICY IF EXISTS "Allow public uploads" ON storage.objects;
+    DROP POLICY IF EXISTS "Allow authenticated deletes" ON storage.objects;
+END $$;
 
 -- Crear políticas de Storage para el bucket 'menu-images'
 
@@ -122,11 +154,17 @@ ORDER BY mi.created_at DESC;
 -- 6. VERIFICAR BUCKET DE STORAGE
 -- =====================================================
 
--- Verificar que el bucket existe (ejecutar en Supabase Dashboard > Storage)
--- Si no existe, créalo manualmente:
--- 1. Ve a Storage
--- 2. Haz clic en "New bucket"
--- 3. Nombre: menu-images
--- 4. Marca "Public bucket"
--- 5. Crea el bucket
+-- Verificar que el bucket existe y está configurado correctamente
+SELECT 
+  id,
+  name,
+  public,
+  file_size_limit,
+  allowed_mime_types,
+  created_at
+FROM storage.buckets
+WHERE id = 'menu-images';
+
+-- Si la query anterior no devuelve resultados, el bucket no existe
+-- Ejecuta la sección 0 de este script para crearlo
 

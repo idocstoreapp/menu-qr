@@ -97,6 +97,8 @@ export default function MenuItemManagerV2() {
         ? { ...formData, id: editingItem.id }
         : formData;
 
+      console.log('📤 Enviando datos:', { method, body });
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -106,10 +108,12 @@ export default function MenuItemManagerV2() {
       const result = await response.json();
 
       if (result.success) {
+        // Forzar recarga de datos para asegurar que se muestre la imagen
         await fetchData();
         closeForm();
         alert(editingItem ? '✅ Item actualizado' : '✅ Item creado');
       } else {
+        console.error('Error guardando item:', result);
         alert('❌ Error: ' + (result.error || 'No se pudo guardar'));
       }
     } catch (error) {
@@ -266,14 +270,22 @@ export default function MenuItemManagerV2() {
           >
             <div className="flex flex-col lg:flex-row gap-4">
               {/* Imagen */}
-              {item.image_url && (
+              {item.image_url ? (
                 <div className="flex-shrink-0">
                   <img
                     src={item.image_url}
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded-lg border border-gold-600"
                     loading="lazy"
+                    onError={(e) => {
+                      console.error('Error cargando imagen:', item.image_url);
+                      e.currentTarget.style.display = 'none';
+                    }}
                   />
+                </div>
+              ) : (
+                <div className="flex-shrink-0 w-20 h-20 bg-gray-700 rounded-lg border border-gray-600 flex items-center justify-center">
+                  <span className="text-gray-500 text-xs">Sin imagen</span>
                 </div>
               )}
 

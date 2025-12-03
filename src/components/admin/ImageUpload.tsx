@@ -50,9 +50,11 @@ export default function ImageUpload({ currentImage, onImageChange, disabled }: I
       const result = await response.json();
 
       if (result.success && result.url) {
+        console.log('✅ Imagen subida correctamente:', result.url);
         setPreview(result.url);
         onImageChange(result.url);
       } else {
+        console.error('❌ Error subiendo imagen:', result);
         setError(result.error || 'Error al subir la imagen');
         setPreview(currentImage || null);
       }
