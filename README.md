@@ -177,3 +177,15 @@ Este proyecto es de uso libre para tu restaurante.
 ---
 
 **Gourmet Árabe** - Sabores Auténticos del Medio Oriente
+
+---
+
+## 👨‍💻 Desarrollador
+
+**Desarrollado por:** [Jonathan Guarirapa](https://jonadevel-portfolio.vercel.app)  
+**Desarrollador de aplicaciones y sitios webs**
+
+- 🌐 **Portfolio:** [jonadevel-portfolio.vercel.app](https://jonadevel-portfolio.vercel.app)
+- 📱 **WhatsApp:** [+56962614851](https://wa.me/56962614851)
+- 📷 **Instagram:** [@jonacrd1](https://instagram.com/jonacrd1)
+- 📧 **Email:** [jona.develp@gmail.com](mailto:jona.develp@gmail.com)

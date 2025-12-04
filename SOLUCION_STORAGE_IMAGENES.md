@@ -124,3 +124,4 @@ El bucket **DEBE ser público** para que las imágenes se puedan mostrar en el m
 
 **¿Sigue sin funcionar?** Revisa los logs en Supabase Dashboard > Logs para ver errores específicos.
 
+

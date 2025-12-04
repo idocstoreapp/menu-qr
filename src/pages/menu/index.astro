@@ -1,5 +1,6 @@
 ---
 import PublicLayout from '../../layouts/PublicLayout.astro';
+import Footer from '../../components/Footer.astro';
 import { supabase } from '../../lib/supabase';
 
 // Obtener categorías activas que tienen items disponibles
@@ -143,23 +144,6 @@ const formatPrice = (price: number) => {
     </div>
   </div>
 
-  <footer class="bg-black/70 backdrop-blur-sm border-t-4 border-gold-600 mt-16 py-8">
-    <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
-      <p class="text-gold-400 font-playfair text-lg">
-        Gourmet Árabe - Sabores Auténticos del Medio Oriente
-      </p>
-      <p class="text-gold-300 font-playfair text-base">
-        📱 +56 9 3945 9286
-      </p>
-      <div class="pt-2 border-t border-gold-600/30 flex justify-center gap-4">
-        <a href="/" class="text-gold-300 hover:text-gold-400 text-sm underline">
-          🏠 Inicio
-        </a>
-        <a href="/print" class="text-gold-300 hover:text-gold-400 text-sm underline">
-          🖨️ Menú Imprimible
-        </a>
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </PublicLayout>
 

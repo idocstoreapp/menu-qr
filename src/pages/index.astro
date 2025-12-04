@@ -3,6 +3,7 @@ import PublicLayout from '../layouts/PublicLayout.astro';
 import HalalInfo from '../components/HalalInfo';
 import NavigationMenu from '../components/NavigationMenu';
 import HeroSlider from '../components/HeroSlider';
+import Footer from '../components/Footer.astro';
 import { supabase } from '../lib/supabase';
 
 // Verificar configuración de Supabase
@@ -260,20 +261,7 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
       </header>
 
       <!-- Footer -->
-      <footer class="border-t-2 border-gold-600/30 bg-black/80 py-6">
-        <div class="max-w-4xl mx-auto px-4 text-center">
-          <p class="text-gold-400 font-playfair mb-2">
-            Gourmet Árabe - Sabores Auténticos del Medio Oriente
-          </p>
-          <p class="text-gold-300/70 text-sm mb-4">
-            📱 +56 9 3945 9286
-          </p>
-          <div class="flex justify-center gap-6">
-            <a href="/print" class="text-gold-400/70 hover:text-gold-400 text-sm transition">🖨️ Menú Imprimible</a>
-            <a href="/admin/login" class="text-gold-400/70 hover:text-gold-400 text-sm transition">🔐 Admin</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   </div>
 

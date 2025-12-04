@@ -55,3 +55,4 @@ LEFT JOIN categories c ON mi.category_id = c.id
 ORDER BY mi.updated_at DESC
 LIMIT 5;
 
+

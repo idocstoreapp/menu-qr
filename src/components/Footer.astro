@@ -1,0 +1,87 @@
+---
+// Componente Footer reutilizable con información discreta del desarrollador
+---
+
+<footer class="bg-black/70 backdrop-blur-sm border-t-4 border-gold-600 mt-16 py-8">
+  <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+    <p class="text-gold-400 font-playfair text-lg">
+      Gourmet Árabe - Sabores Auténticos del Medio Oriente
+    </p>
+    <p class="text-gold-300 font-playfair text-base">
+      📱 +56 9 3945 9286
+    </p>
+    <div class="pt-2 border-t border-gold-600/30 flex flex-col sm:flex-row justify-center items-center gap-4">
+      <a 
+        href="/menu/print" 
+        class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors flex items-center gap-2"
+        title="Versión Imprimible del Menú"
+      >
+        🖨️ Menú Imprimible
+      </a>
+      <span class="text-gold-600/50 hidden sm:inline">|</span>
+      <a 
+        href="/admin/login" 
+        class="text-gold-300 hover:text-gold-400 text-sm underline transition-colors"
+        title="Acceso Administrativo"
+      >
+        🔐 Acceso Admin
+      </a>
+    </div>
+    
+    <!-- Firma discreta del desarrollador -->
+    <div class="pt-4 mt-4 border-t border-gold-600/20">
+      <p class="text-gold-400/40 text-xs">
+        <span class="text-gold-400/50">Desarrollado por</span>{' '}
+        <a 
+          href="https://jonadevel-portfolio.vercel.app" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-gold-400/60 hover:text-gold-400 underline transition-colors font-medium"
+          title="Portfolio de Jonathan Guarirapa - Desarrollador de aplicaciones y sitios webs"
+        >
+          Jonathan Guarirapa
+        </a>
+        {' '}
+        <span class="text-gold-400/50">· Desarrollador de aplicaciones y sitios webs ·</span>{' '}
+        <a 
+          href="https://jonadevel-portfolio.vercel.app" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-gold-400/60 hover:text-gold-400 underline transition-colors font-medium"
+          title="Ver Portfolio"
+        >
+          Portfolio
+        </a>
+        {' '}·{' '}
+        <a 
+          href="https://wa.me/56962614851" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-gold-400/60 hover:text-gold-400 underline transition-colors font-medium"
+          title="Contactar por WhatsApp: +56962614851"
+        >
+          WhatsApp
+        </a>
+        {' '}·{' '}
+        <a 
+          href="mailto:jona.develp@gmail.com" 
+          class="text-gold-400/60 hover:text-gold-400 underline transition-colors font-medium"
+          title="Enviar correo a jona.develp@gmail.com"
+        >
+          Email
+        </a>
+        {' '}·{' '}
+        <a 
+          href="https://instagram.com/jonacrd1" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="text-gold-400/60 hover:text-gold-400 underline transition-colors font-medium"
+          title="Seguir en Instagram: @jonacrd1"
+        >
+          Instagram
+        </a>
+      </p>
+    </div>
+  </div>
+</footer>
+
