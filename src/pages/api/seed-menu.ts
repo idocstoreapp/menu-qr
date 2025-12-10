@@ -265,44 +265,88 @@ const menuItems = [
 export const GET: APIRoute = async () => {
   try {
     const results: any = {
-      categories: { created: 0, errors: [] },
-      items: { created: 0, errors: [] },
+      categories: { created: 0, updated: 0, errors: [] },
+      items: { created: 0, updated: 0, skipped: 0, errors: [] },
     };
 
-    // 1. Limpiar tablas existentes
-    console.log('🗑️ Limpiando datos existentes...');
-    await supabase.from('menu_items').delete().neq('id', 0);
-    await supabase.from('categories').delete().neq('id', 0);
+    // 1. Obtener categorías existentes
+    console.log('📁 Procesando categorías...');
+    const { data: existingCats } = await supabase
+      .from('categories')
+      .select('id, slug, name');
+    
+    const existingCatsMap = new Map<string, any>();
+    if (existingCats) {
+      existingCats.forEach(cat => existingCatsMap.set(cat.slug, cat));
+    }
 
-    // 2. Crear categorías
-    console.log('📁 Creando categorías...');
+    // 2. Crear o actualizar categorías (UPSERT)
     const categoryMap = new Map<string, number>();
 
     for (const cat of categories) {
-      const { data, error } = await supabase
-        .from('categories')
-        .insert([{
-          name: cat.name,
-          slug: cat.slug,
-          description: cat.description,
-          order_num: cat.order_num,
-          is_active: true,
-        }])
-        .select()
-        .single();
+      const existing = existingCatsMap.get(cat.slug);
+      
+      if (existing) {
+        // Categoría existe, actualizar (pero mantener is_active si ya está activa)
+        const { data, error } = await supabase
+          .from('categories')
+          .update({
+            name: cat.name,
+            description: cat.description,
+            order_num: cat.order_num,
+            // NO sobrescribir is_active si ya existe
+          })
+          .eq('id', existing.id)
+          .select()
+          .single();
 
-      if (error) {
-        console.error(`Error creando categoría ${cat.name}:`, error);
-        results.categories.errors.push({ name: cat.name, error: error.message });
-      } else if (data) {
-        categoryMap.set(cat.slug, data.id);
-        results.categories.created++;
-        console.log(`✅ Categoría creada: ${cat.name} (ID: ${data.id})`);
+        if (error) {
+          console.error(`Error actualizando categoría ${cat.name}:`, error);
+          results.categories.errors.push({ name: cat.name, error: error.message });
+        } else if (data) {
+          categoryMap.set(cat.slug, data.id);
+          results.categories.updated++;
+          console.log(`🔄 Categoría actualizada: ${cat.name} (ID: ${data.id})`);
+        }
+      } else {
+        // Categoría nueva, crear
+        const { data, error } = await supabase
+          .from('categories')
+          .insert([{
+            name: cat.name,
+            slug: cat.slug,
+            description: cat.description,
+            order_num: cat.order_num,
+            is_active: true,
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          console.error(`Error creando categoría ${cat.name}:`, error);
+          results.categories.errors.push({ name: cat.name, error: error.message });
+        } else if (data) {
+          categoryMap.set(cat.slug, data.id);
+          results.categories.created++;
+          console.log(`✅ Categoría creada: ${cat.name} (ID: ${data.id})`);
+        }
       }
     }
 
-    // 3. Crear items del menú con imágenes
-    console.log('🍽️ Creando items del menú con imágenes...');
+    // 3. Obtener items existentes para verificar precios
+    console.log('🍽️ Procesando items del menú...');
+    const { data: existingItems } = await supabase
+      .from('menu_items')
+      .select('id, name, category_id, price');
+    
+    const existingItemsMap = new Map<string, any>();
+    if (existingItems) {
+      existingItems.forEach(item => {
+        // Usar nombre + category_id como clave única
+        const key = `${item.name.toLowerCase().trim()}_${item.category_id}`;
+        existingItemsMap.set(key, item);
+      });
+    }
     
     for (const item of menuItems) {
       const categoryId = categoryMap.get(item.categorySlug);
@@ -314,29 +358,61 @@ export const GET: APIRoute = async () => {
 
       // Usar imageUrl del item o intentar mapear automáticamente
       const imageUrl = (item as any).imageUrl || getImageUrl(item.name, item.categorySlug);
+      
+      // Verificar si el item ya existe
+      const itemKey = `${item.name.toLowerCase().trim()}_${categoryId}`;
+      const existing = existingItemsMap.get(itemKey);
 
-      const { data, error } = await supabase
-        .from('menu_items')
-        .insert([{
-          name: item.name,
-          description: item.description,
-          price: item.price,
-          category_id: categoryId,
-          image_url: imageUrl,
-          order_num: item.order_num,
-          is_available: true,
-          is_featured: (item as any).is_featured || false,
-        }])
-        .select()
-        .single();
+      if (existing) {
+        // Item existe: actualizar TODO EXCEPTO el precio (respetar precio de la BD)
+        const { data, error } = await supabase
+          .from('menu_items')
+          .update({
+            description: item.description,
+            // price: NO ACTUALIZAR - mantener el precio existente de la BD
+            image_url: imageUrl || existing.image_url, // Actualizar imagen solo si hay nueva
+            order_num: item.order_num,
+            is_available: true, // Mantener disponible
+            is_featured: (item as any).is_featured || false,
+          })
+          .eq('id', existing.id)
+          .select()
+          .single();
 
-      if (error) {
-        console.error(`Error creando item ${item.name}:`, error);
-        results.items.errors.push({ name: item.name, error: error.message });
+        if (error) {
+          console.error(`Error actualizando item ${item.name}:`, error);
+          results.items.errors.push({ name: item.name, error: error.message });
+        } else {
+          results.items.updated++;
+          console.log(`🔄 ${item.name} - Precio preservado: $${existing.price} (ID: ${existing.id})`);
+        }
       } else {
-        results.items.created++;
-        if (imageUrl) {
-          console.log(`✅ ${item.name} - Imagen: ${imageUrl}`);
+        // Item nuevo: crear con precio del seed
+        const { data, error } = await supabase
+          .from('menu_items')
+          .insert([{
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            category_id: categoryId,
+            image_url: imageUrl,
+            order_num: item.order_num,
+            is_available: true,
+            is_featured: (item as any).is_featured || false,
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          console.error(`Error creando item ${item.name}:`, error);
+          results.items.errors.push({ name: item.name, error: error.message });
+        } else {
+          results.items.created++;
+          if (imageUrl) {
+            console.log(`✅ ${item.name} - Precio: $${item.price} - Imagen: ${imageUrl}`);
+          } else {
+            console.log(`✅ ${item.name} - Precio: $${item.price}`);
+          }
         }
       }
     }
@@ -345,17 +421,18 @@ export const GET: APIRoute = async () => {
 
     return jsonResponse({
       success: true,
-      message: '✅ Menú COMPLETO con imágenes cargado correctamente',
+      message: '✅ Menú actualizado correctamente - PRECIOS EXISTENTES PRESERVADOS',
       results: {
-        categories: `${results.categories.created} categorías creadas`,
-        items: `${results.items.created} items creados`,
+        categories: `${results.categories.created} creadas, ${results.categories.updated} actualizadas`,
+        items: `${results.items.created} creados, ${results.items.updated} actualizados (precios preservados)`,
         itemsWithImages: menuItems.filter(i => (i as any).imageUrl || getImageUrl(i.name, i.categorySlug)).length,
         errors: results.categories.errors.length + results.items.errors.length > 0 
           ? [...results.categories.errors, ...results.items.errors]
           : 'Ninguno'
       },
       categorias_creadas: categories.map(c => c.name),
-      next_step: 'Visita / para ver el menú con imágenes o /admin para administrarlo'
+      next_step: 'Visita / para ver el menú con imágenes o /admin para administrarlo',
+      importante: '⚠️ Los precios editados en el admin panel NO fueron sobrescritos'
     });
 
   } catch (error: any) {

@@ -47,3 +47,4 @@ LEFT JOIN categories c ON mi.category_id = c.id
 WHERE mi.is_available = false;
 
 
+

@@ -70,20 +70,20 @@ const formatPrice = (price: number) => {
         <div class="space-y-12">
           {categoriesWithItems.map((category) => (
             <section id={category.slug} class="scroll-mt-8">
-              <h2 class="text-2xl md:text-3xl font-cinzel text-gold-400 mb-6 pb-3 border-b-2 border-gold-600" style="text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">
+              <h2 class="text-2xl md:text-3xl font-cinzel text-gold-400 mb-6 pb-3 border-b border-gold-600 border-gold-elegant" style="text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);">
                 {category.name}
               </h2>
               
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {itemsByCategory.get(category.id)?.map((item: any) => (
-                  <div class="bg-black/60 backdrop-blur-sm border border-gold-600 rounded-xl overflow-hidden hover:border-gold-400 transition group">
+                  <div class="bg-black/60 backdrop-blur-sm border-gold-elegant rounded-xl overflow-hidden transition group">
                     {/* Imagen del producto */}
                     {item.image_url && (
-                      <div class="relative h-48 overflow-hidden">
+                      <div class="relative h-48 overflow-hidden menu-image-container">
                         <img 
                           src={item.image_url} 
                           alt={item.name}
-                          class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          class="w-full h-full object-cover"
                           loading="lazy"
                         />
                         {item.is_featured && (

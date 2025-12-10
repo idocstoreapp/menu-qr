@@ -8,11 +8,40 @@ interface MenuItem {
   isAvailable: boolean;
 }
 
+import { useEffect, useRef } from 'react';
+
 interface MenuItemCardProps {
   item: MenuItem;
 }
 
 export default function MenuItemCard({ item }: MenuItemCardProps) {
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const flashRef = useRef<HTMLDivElement>(null);
+  
+  // Generar delay aleatorio único para cada card (0-12 segundos)
+  useEffect(() => {
+    if (!imageContainerRef.current) return;
+    
+    // Delay aleatorio entre 0 y 12 segundos
+    const randomDelay = Math.random() * 12;
+    // Duración aleatoria entre 12 y 15 segundos
+    const randomDuration = 12 + Math.random() * 3;
+    
+    // Aplicar delay y duración a la imagen
+    const img = imageContainerRef.current.querySelector('img, video');
+    if (img) {
+      (img as HTMLElement).style.animationDelay = `${randomDelay}s`;
+      (img as HTMLElement).style.animationDuration = `${randomDuration}s`;
+    }
+    
+    // Aplicar EXACTAMENTE el mismo delay y duración al flash para sincronización perfecta
+    if (flashRef.current) {
+      flashRef.current.style.animationDelay = `${randomDelay}s`;
+      flashRef.current.style.animationDuration = `${randomDuration}s`;
+      flashRef.current.style.animation = `flashReflection ${randomDuration}s ease-in-out infinite`;
+    }
+  }, []);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-CL', {
       style: 'currency',
@@ -22,12 +51,11 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
 
   return (
     <div 
-      className="bg-black/50 backdrop-blur-sm rounded-lg overflow-hidden border-2 border-gold-600 hover:border-gold-400 transition-all duration-300 hover:scale-105 hover:shadow-xl" 
-      style={{boxShadow: '0 0 15px rgba(212, 175, 55, 0.3)'}}
+      className="bg-black/50 backdrop-blur-sm rounded-lg overflow-hidden border-gold-elegant transition-all duration-300 hover:scale-105 hover:shadow-xl" 
       data-item-id={item.id}
     >
       {(item.videoUrl || item.imageUrl) && (
-        <div className="h-48 overflow-hidden relative">
+        <div ref={imageContainerRef} className="h-48 overflow-hidden relative menu-image-container">
           {item.videoUrl ? (
             <video
               src={item.videoUrl}
@@ -45,6 +73,18 @@ export default function MenuItemCard({ item }: MenuItemCardProps) {
               loading="lazy"
             />
           ) : null}
+          <div ref={flashRef} className="flash-overlay absolute pointer-events-none" style={{
+            top: '-50%',
+            left: '-200%',
+            width: '200%',
+            height: '200%',
+            background: 'linear-gradient(135deg, transparent 0%, transparent 25%, rgba(255, 255, 255, 0.6) 42%, rgba(255, 255, 255, 0.9) 48%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0.9) 52%, rgba(255, 255, 255, 0.6) 58%, transparent 75%, transparent 100%)',
+            transform: 'rotate(-45deg)',
+            transformOrigin: 'center center',
+            animation: 'flashReflection 12s ease-in-out infinite',
+            zIndex: 10,
+            opacity: 0
+          }}></div>
         </div>
       )}
       <div className="p-4">

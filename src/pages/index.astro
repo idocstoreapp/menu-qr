@@ -25,8 +25,8 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
 
     if (itemsError) {
       console.error('Error obteniendo items:', itemsError);
-    }
-    
+  }
+
     // Obtener TODAS las categorías activas (no solo las que tienen items)
     // Esto permite mostrar categorías nuevas aunque aún no tengan items
     const { data: cats, error: catsError } = await supabase
@@ -49,7 +49,7 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
 
     if (!featuredError && featured) {
       featuredItems = featured || [];
-    }
+  }
 
     // Obtener imágenes destacadas de diferentes categorías para el hero slider
     // Una imagen destacada por cada categoría principal (máximo 5)
@@ -63,7 +63,7 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
         .eq('slug', slug)
         .eq('is_active', true)
         .single();
-
+    
       if (category) {
         // Obtener un item con imagen de esta categoría (preferir destacados)
         const { data: items } = await supabase
@@ -110,8 +110,8 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
           <!-- Logo -->
           <div class="relative mx-auto w-56 h-56 md:w-80 md:h-80 lg:w-96 lg:h-96 mb-6">
             <div class="absolute inset-0 bg-gold-500/20 rounded-full blur-3xl animate-pulse"></div>
-            <img 
-              src="/logo-cropped.png" 
+          <img 
+            src="/logo-cropped.png" 
               alt="Gourmet Árabe" 
               class="relative w-full h-full object-contain drop-shadow-[0_0_30px_rgba(212,175,55,0.5)] animate-float"
             />
@@ -127,7 +127,7 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
 
           <!-- Información Halal -->
           <div class="mb-8 max-w-2xl mx-auto px-4">
-            <div class="border border-gold-600/40 rounded-lg p-4 bg-black/50 backdrop-blur-sm">
+            <div class="border-gold-elegant rounded-lg p-4 bg-black/50 backdrop-blur-sm">
               <div class="flex items-center justify-center gap-2 mb-2">
                 <span class="text-2xl">🕌</span>
                 <p class="text-gold-400 font-cinzel text-sm font-semibold">
@@ -138,10 +138,10 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
                 Trabajamos exclusivamente con carne halal: animales criados y sacrificados según las leyes islámicas, 
                 con trato ético, dieta vegetariana sin hormonas ni antibióticos, y método de sacrificio ritual respetuoso.
               </p>
-            </div>
-          </div>
+        </div>
+      </div>
 
-          {activeCategories.length > 0 ? (
+      {activeCategories.length > 0 ? (
             <div class="space-y-8">
               <!-- Mensaje -->
               <div class="inline-block">
@@ -153,18 +153,16 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
               <!-- Grid de categorías -->
               <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
                 {activeCategories.map((category, index) => (
-                  <a
-                    href={`/${category.slug}`}
+              <a
+                href={`/${category.slug}`}
                     class="category-btn group relative overflow-hidden"
                     style={`animation-delay: ${index * 0.1}s`}
                   >
                     <div class="
-                      relative border-2 border-gold-500 rounded-lg p-4 
+                      relative border-gold-elegant rounded-lg p-4 
                       bg-gradient-to-b from-gold-600/10 to-transparent
                       transition-all duration-300
-                      group-hover:border-gold-400 
                       group-hover:bg-gradient-to-b group-hover:from-gold-500 group-hover:to-gold-600
-                      group-hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]
                     ">
                       <!-- Decoración de esquinas -->
                       <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-gold-400 rounded-tl opacity-50 group-hover:opacity-100"></div>
@@ -186,14 +184,14 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
               <!-- Items destacados -->
               {featuredItems && featuredItems.length > 0 && (
                 <div class="mt-12 max-w-4xl mx-auto">
-                  <div class="border-2 border-gold-600/30 rounded-lg p-6 bg-black/40 backdrop-blur-sm">
+                  <div class="border-gold-elegant rounded-lg p-6 bg-black/40 backdrop-blur-sm">
                     <h3 class="font-cinzel text-gold-400 text-xl mb-4 text-center">
                       ⭐ DESTACADOS ⭐
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {featuredItems.map((item: any) => (
                         <a href={`/${item.category?.slug || ''}`} class="block group">
-                          <div class="flex items-center gap-4 p-3 rounded-lg border border-gold-600/30 hover:border-gold-500 hover:bg-gold-600/10 transition-all">
+                          <div class="flex items-center gap-4 p-3 rounded-lg border-gold-elegant hover:bg-gold-600/10 transition-all">
                             {item.image_url && (
                               <img 
                                 src={item.image_url} 
@@ -209,15 +207,15 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
                               ${item.price.toLocaleString('es-CL')}
                             </span>
                           </div>
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+              </a>
+            ))}
+          </div>
+        </div>
+        </div>
+      )}
+    </div>
           ) : (
-            <div class="border-2 border-gold-600/50 rounded-lg p-8 bg-black/60 backdrop-blur-sm max-w-md mx-auto">
+            <div class="border-gold-elegant rounded-lg p-8 bg-black/60 backdrop-blur-sm max-w-md mx-auto">
               {!isConfigured ? (
                 <>
                   <p class="text-red-400 text-xl mb-4">⚠️ Configuración Pendiente</p>
@@ -231,10 +229,10 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
                       <li>PUBLIC_SUPABASE_ANON_KEY</li>
                       <li>JWT_SECRET</li>
                     </ul>
-                  </div>
+  </div>
                   <p class="text-gold-300/70 text-xs mb-4">
                     Revisa el archivo <code class="bg-black/50 px-2 py-1 rounded">CONFIGURACION_PRODUCCION.md</code> para más detalles.
-                  </p>
+        </p>
                   <a 
                     href="/api/check-config" 
                     target="_blank"
@@ -247,12 +245,12 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
                 <>
                   <p class="text-gold-400 text-xl mb-4">Menú en preparación</p>
                   <p class="text-gold-300/70 mb-6">Estamos preparando nuestro menú digital</p>
-                  <a 
-                    href="/admin/login" 
+          <a 
+            href="/admin/login" 
                     class="inline-block px-6 py-2 border-2 border-gold-600 text-gold-400 rounded-lg hover:bg-gold-600 hover:text-black transition-all"
-                  >
+          >
                     Acceso Admin
-                  </a>
+          </a>
                 </>
               )}
             </div>
@@ -262,8 +260,8 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
 
       <!-- Footer -->
       <Footer />
+        </div>
     </div>
-  </div>
 
   <!-- Componente flotante de información Halal -->
   <HalalInfo client:load />
@@ -292,10 +290,10 @@ if (isConfigured && supabaseUrl !== 'https://placeholder.supabase.co') {
     from {
       opacity: 0;
       transform: translateY(20px);
-    }
+        }
     to {
       opacity: 1;
       transform: translateY(0);
-    }
+      }
   }
 </style>

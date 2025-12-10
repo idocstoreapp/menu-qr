@@ -18,7 +18,7 @@ let allCategories: any[] = [];
 let heroImages: string[] = [];
 
 if (isConfigured) {
-  try {
+try {
     // Obtener la categoría por slug
     const { data: cat, error: catError } = await supabase
       .from('categories')
@@ -99,10 +99,10 @@ if (isConfigured) {
     console.error('Error cargando datos:', error?.message || error);
     return Astro.redirect('/');
   }
-} else {
+  } else {
   // Si no está configurado, redirigir al inicio
   return Astro.redirect('/');
-}
+  }
 
 const formatPrice = (price: number) => {
   if (price === 0) return 'Consultar';
@@ -132,62 +132,25 @@ const hasMeat = (itemName: string, description: string = '') => {
     <div class="absolute inset-0 opacity-10 z-0" style="background-image: url('/fondo.png'); background-size: cover; background-position: center;"></div>
     
     <div class="relative z-10">
-      <!-- Header con Logo -->
-      <header class="pt-6 pb-4 text-center relative z-30">
+      <!-- Header compacto con Logo -->
+      <header class="pt-20 pb-2 text-center relative z-30">
         <a href="/" class="inline-block">
-          <div class="relative mx-auto w-48 h-48 md:w-64 md:h-64 mb-2">
-            <img 
-              src="/logo-cropped.png" 
+          <div class="relative mx-auto w-48 h-48 md:w-56 md:h-56">
+          <img 
+            src="/logo-cropped.png" 
               alt="Gourmet Árabe" 
               class="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]"
-            />
-          </div>
-          <h1 class="font-cinzel text-gold-500 text-2xl tracking-wider" style="text-shadow: 0 0 20px rgba(212,175,55,0.3);">
-            GOURMET ÁRABE
-          </h1>
+          />
+        </div>
         </a>
       </header>
 
-      <!-- Navegación de categorías -->
-      <nav class="px-4 pb-6 relative z-30">
-        <div class="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
-          {allCategories?.map((cat) => (
-            <a 
-              href={`/${cat.slug}`}
-              class={`
-                px-4 py-2 text-sm font-semibold tracking-wide transition-all duration-300
-                border-2 rounded
-                ${cat.slug === categorySlug
-                  ? 'bg-gradient-to-b from-gold-400 to-gold-600 text-black border-gold-300 shadow-[0_0_15px_rgba(212,175,55,0.4)]'
-                  : 'bg-transparent text-gold-400 border-gold-600/50 hover:border-gold-400 hover:bg-gold-600/10'
-                }
-              `}
-            >
-              {cat.name.toUpperCase()}
-            </a>
-          ))}
-        </div>
-      </nav>
-
-      <!-- Título de la sección con decoración árabe -->
-      <div class="px-4 mb-8 relative z-20">
-        <div class="max-w-xl mx-auto">
-          <div class="relative border-4 border-gold-500 rounded-lg p-4 bg-black/60 backdrop-blur-sm">
-            <!-- Esquinas decorativas -->
-            <div class="absolute -top-1 -left-1 w-4 h-4 border-t-4 border-l-4 border-gold-400"></div>
-            <div class="absolute -top-1 -right-1 w-4 h-4 border-t-4 border-r-4 border-gold-400"></div>
-            <div class="absolute -bottom-1 -left-1 w-4 h-4 border-b-4 border-l-4 border-gold-400"></div>
-            <div class="absolute -bottom-1 -right-1 w-4 h-4 border-b-4 border-r-4 border-gold-400"></div>
-            
-            <!-- Decoración interior -->
-            <div class="border-2 border-gold-600/50 rounded p-3">
-              <h2 class="text-center font-cinzel text-gold-400 text-2xl md:text-3xl tracking-widest">
-                <span class="text-gold-500">★</span>
-                <span class="mx-4">{category.name.toUpperCase()}</span>
-                <span class="text-gold-500">★</span>
-              </h2>
-            </div>
-          </div>
+      <!-- Título de la sección discreto -->
+      <div class="px-4 mb-4 relative z-20">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="text-center font-cinzel text-gold-400 text-lg md:text-xl tracking-wide border-b border-gold-600/30 pb-2">
+            {category.name.toUpperCase()}
+          </h2>
         </div>
       </div>
 
@@ -199,15 +162,15 @@ const hasMeat = (itemName: string, description: string = '') => {
               {items.map((item) => (
                 <div class="menu-card group">
                   <!-- Borde decorativo árabe -->
-                  <div class="relative border-3 border-gold-500 rounded-lg overflow-hidden bg-black/70 backdrop-blur-sm transition-all duration-300 hover:border-gold-400 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)]">
+                  <div class="relative border-gold-elegant rounded-lg overflow-hidden bg-black/70 backdrop-blur-sm transition-all duration-300">
                     
                     {/* Imagen del producto */}
                     {item.image_url && (
-                      <div class="relative h-48 overflow-hidden">
+                      <div class="relative h-48 overflow-hidden menu-image-container">
                         <img 
                           src={item.image_url} 
                           alt={item.name}
-                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          class="w-full h-full object-cover"
                           loading="lazy"
                         />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -249,7 +212,7 @@ const hasMeat = (itemName: string, description: string = '') => {
                           </span>
                         </div>
                       </div>
-                    </div>
+    </div>
 
                     {/* Decoración de esquinas */}
                     <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-gold-400/50 rounded-tl"></div>
@@ -259,32 +222,28 @@ const hasMeat = (itemName: string, description: string = '') => {
                   </div>
                 </div>
               ))}
-            </div>
-          ) : (
+        </div>
+    ) : (
             <div class="text-center py-16">
-              <div class="border-2 border-gold-600/50 rounded-lg p-8 bg-black/50 max-w-md mx-auto">
+              <div class="border-gold-elegant rounded-lg p-8 bg-black/50 max-w-md mx-auto">
                 <p class="text-gold-400 text-xl mb-4">No hay items disponibles</p>
-                <a href="/" class="text-gold-300 hover:text-gold-400 underline">Volver al inicio</a>
+        <a href="/" class="text-gold-300 hover:text-gold-400 underline">Volver al inicio</a>
               </div>
-            </div>
-          )}
+      </div>
+    )}
         </div>
       </div>
 
       <!-- Footer -->
       <Footer />
+        </div>
     </div>
-  </div>
 
   <!-- Componente flotante de información Halal -->
   <HalalInfo client:load />
 </PublicLayout>
 
 <style>
-  .border-3 {
-    border-width: 3px;
-  }
-  
   .menu-card {
     animation: fadeInUp 0.5s ease-out forwards;
     opacity: 0;

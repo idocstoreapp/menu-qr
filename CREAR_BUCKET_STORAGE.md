@@ -108,3 +108,4 @@ USING (bucket_id = 'menu-images');
 **¿Sigue sin funcionar?** Revisa los logs en Supabase Dashboard > Logs para ver el error específico.
 
 
+

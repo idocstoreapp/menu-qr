@@ -85,14 +85,14 @@ const formatPrice = (price: number) => {
       {items && items.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (
-            <div class="bg-black/60 backdrop-blur-sm border border-gold-600 rounded-xl overflow-hidden hover:border-gold-400 transition group">
+            <div class="bg-black/60 backdrop-blur-sm border-gold-elegant rounded-xl overflow-hidden transition group">
               {/* Imagen del producto */}
               {item.image_url && (
-                <div class="relative h-48 overflow-hidden">
+                <div class="relative h-48 overflow-hidden menu-image-container">
                   <img 
                     src={item.image_url} 
                     alt={item.name}
-                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    class="w-full h-full object-cover"
                     loading="lazy"
                   />
                   {item.is_featured && (

@@ -108,3 +108,4 @@ He modificado `src/pages/index.astro` para que:
 **¿Sigue sin aparecer?** Revisa los logs de la consola del navegador (F12) para ver si hay errores.
 
 
+
